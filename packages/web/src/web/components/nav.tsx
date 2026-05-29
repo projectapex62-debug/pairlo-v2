@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Moon, Sun, Heart } from "lucide-react";
+import { Moon, Sun, Heart, X as XIcon } from "lucide-react";
 import { getWishlist } from "../lib/wishlist";
 
 export function Nav() {
@@ -9,6 +9,9 @@ export function Nav() {
   const [location] = useLocation();
   const [dark, setDark] = useState(() => localStorage.getItem("pairlo-dark") === "1");
   const [wishlistCount, setWishlistCount] = useState(() => getWishlist().length);
+  const [bannerVisible, setBannerVisible] = useState(() => {
+    try { return sessionStorage.getItem("pairlo-banner-dismissed") !== "1"; } catch { return true; }
+  });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -41,11 +44,40 @@ export function Nav() {
 
   const isActive = (href: string) => location === href;
 
+  const dismissBanner = () => {
+    setBannerVisible(false);
+    try { sessionStorage.setItem("pairlo-banner-dismissed", "1"); } catch {}
+  };
+
   return (
     <>
+      {/* ── ANNOUNCEMENT BANNER ── */}
+      {bannerVisible && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, zIndex: 101,
+          height: "40px", background: "linear-gradient(90deg, #5A3F24 0%, #7B5B3A 50%, #5A3F24 100%)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "0 48px",
+        }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "white", letterSpacing: "0.02em", textAlign: "center" }}>
+            🚀 Early Access open —{" "}
+            <Link to="/contact">
+              <span style={{ color: "rgba(255,255,255,0.85)", textDecoration: "underline", cursor: "pointer" }}>join the waitlist</span>
+            </Link>
+          </p>
+          <button
+            onClick={dismissBanner}
+            aria-label="Dismiss"
+            style={{ position: "absolute", right: "16px", background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", padding: "4px" }}
+          >
+            <XIcon size={14} color="rgba(255,255,255,0.7)" />
+          </button>
+        </div>
+      )}
+
       <nav
         style={{
-          position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+          position: "fixed", top: bannerVisible ? "40px" : "0", left: 0, right: 0, zIndex: 100,
           background: scrolled ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.15)",
           backdropFilter: "blur(12px)",
           borderBottom: scrolled ? "1px solid var(--color-gray-200)" : "none",
@@ -135,9 +167,9 @@ export function Nav() {
             style={{ display: "none", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "5px", width: "40px", height: "40px", background: "transparent", border: "none", cursor: "pointer", padding: "0" }}
             className="show-mobile"
           >
-            <span style={{ display: "block", width: "22px", height: "1.5px", background: "white", transition: "all 0.25s ease", transform: menuOpen ? "translateY(6.5px) rotate(45deg)" : "none" }} />
-            <span style={{ display: "block", width: "22px", height: "1.5px", background: "white", transition: "all 0.25s ease", opacity: menuOpen ? 0 : 1 }} />
-            <span style={{ display: "block", width: "22px", height: "1.5px", background: "white", transition: "all 0.25s ease", transform: menuOpen ? "translateY(-6.5px) rotate(-45deg)" : "none" }} />
+            <span style={{ display: "block", width: "22px", height: "1.5px", background: scrolled ? "var(--color-black)" : "white", transition: "all 0.25s ease", transform: menuOpen ? "translateY(6.5px) rotate(45deg)" : "none" }} />
+            <span style={{ display: "block", width: "22px", height: "1.5px", background: scrolled ? "var(--color-black)" : "white", transition: "all 0.25s ease", opacity: menuOpen ? 0 : 1 }} />
+            <span style={{ display: "block", width: "22px", height: "1.5px", background: scrolled ? "var(--color-black)" : "white", transition: "all 0.25s ease", transform: menuOpen ? "translateY(-6.5px) rotate(-45deg)" : "none" }} />
           </button>
         </div>
 

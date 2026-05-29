@@ -325,6 +325,22 @@ export default function SearchPage() {
       if (maxPrice < 800 && stayPrice > maxPrice) return false;
       if (carType !== "Any car" && !(p.car?.type ?? "").includes(carType) && !(p.car?.name ?? "").includes(carType)) return false;
       if (minRating > 0 && p.stay.rating < minRating) return false;
+      if (vibeFilter) {
+        const tags = (p.stay.tags ?? []).join(" ").toLowerCase();
+        const loc = (p.stay.location ?? "").toLowerCase();
+        const vibe = vibeFilter.toLowerCase();
+        const vibeMap: Record<string, string[]> = {
+          beach: ["beach", "ocean", "coastal", "surf", "malibu", "miami", "hawaii"],
+          mountain: ["mountain", "ski", "aspen", "alpine", "altitude", "sedona"],
+          city: ["city", "urban", "manhattan", "new york", "chicago", "skyline"],
+          romantic: ["romantic", "villa", "wine", "private", "butler", "suite"],
+          adventure: ["adventure", "trail", "outdoor", "jeep", "canyon", "convertible"],
+          family: ["family", "kids", "beds", "pool", "spacious"],
+        };
+        const keywords = vibeMap[vibe] ?? [vibe];
+        const match = keywords.some(k => tags.includes(k) || loc.includes(k));
+        if (!match) return false;
+      }
       return true;
     })
     .sort((a, b) => {
@@ -499,6 +515,28 @@ export default function SearchPage() {
               </button>
             ))}
           </div>
+
+          {/* ── VIBE FILTER PILLS ── */}
+          <div style={{ paddingBottom: "16px", display: "flex", alignItems: "center", gap: "8px", overflowX: "auto" }}>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.12em", color: "rgba(255,255,255,0.35)", textTransform: "uppercase", flexShrink: 0, marginRight: "4px" }}>Vibe</span>
+            {VIBE_FILTERS.map((v) => {
+              const active = vibeFilter === v.label;
+              return (
+                <button key={v.label} onClick={() => setVibeFilter(active ? null : v.label)} style={{
+                  display: "inline-flex", alignItems: "center", gap: "5px",
+                  padding: "6px 14px", border: `1px solid ${active ? "var(--color-mocha)" : "rgba(255,255,255,0.18)"}`,
+                  borderRadius: "100px", flexShrink: 0,
+                  background: active ? "var(--color-mocha)" : "rgba(255,255,255,0.06)",
+                  color: active ? "white" : "rgba(255,255,255,0.65)",
+                  fontFamily: "var(--font-body)", fontSize: "12px", fontWeight: active ? 600 : 400,
+                  cursor: "pointer", transition: "all 0.18s", letterSpacing: "0.02em",
+                }}>
+                  <span>{v.icon}</span> {v.label}
+                </button>
+              );
+            })}
+          </div>
+
         </div>
       </div>
 

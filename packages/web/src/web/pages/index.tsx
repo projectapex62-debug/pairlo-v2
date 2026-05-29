@@ -238,8 +238,9 @@ export default function HomePage() {
           alt="Luxury travel"
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
         />
-        {/* Overlay */}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(20,20,20,0.38) 0%, rgba(20,20,20,0.18) 50%, rgba(20,20,20,0.55) 100%)" }} />
+        {/* Overlay — richer cinematic gradient */}
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(165deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.15) 45%, rgba(10,10,10,0.65) 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.5) 100%)" }} />
 
         {/* Hero content */}
         <div
@@ -254,25 +255,27 @@ export default function HomePage() {
             padding: "0 24px",
           }}
         >
-          <p className="fade-in d100" style={{ color: "var(--color-mocha-pale)", fontFamily: "var(--font-body)", fontSize: "13px", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "20px" }}>
-            The smarter way to travel
-          </p>
+          <div className="fade-in d100" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(123,91,58,0.35)", backdropFilter: "blur(8px)", border: "1px solid rgba(123,91,58,0.5)", borderRadius: "100px", padding: "6px 18px", marginBottom: "28px" }}>
+            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#7B5B3A", boxShadow: "0 0 8px rgba(123,91,58,0.8)", display: "inline-block" }} />
+            <span style={{ color: "rgba(255,255,255,0.9)", fontFamily: "var(--font-body)", fontSize: "12px", letterSpacing: "0.16em", textTransform: "uppercase" }}>The smarter way to travel</span>
+          </div>
           <h1
             className="fade-up d200"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(46px, 7vw, 92px)",
+              fontSize: "clamp(50px, 7.5vw, 96px)",
               fontWeight: 400,
               color: "white",
-              lineHeight: 1.05,
-              maxWidth: "820px",
+              lineHeight: 1.02,
+              maxWidth: "860px",
+              textShadow: "0 2px 40px rgba(0,0,0,0.4)",
             }}
           >
             One Search.<br />
-            <em style={{ fontStyle: "italic", color: "var(--color-mocha-pale)" }}>Two Keys.</em><br />
+            <em style={{ fontStyle: "italic", color: "#E8C99A" }}>Two Keys.</em><br />
             Zero Hassle.
           </h1>
-          <p className="fade-up d300" style={{ color: "rgba(255,255,255,0.7)", fontFamily: "var(--font-body)", fontSize: "clamp(14px,1.5vw,18px)", marginTop: "24px", maxWidth: "520px", lineHeight: 1.7 }}>
+          <p className="fade-up d300" style={{ color: "rgba(255,255,255,0.72)", fontFamily: "var(--font-body)", fontSize: "clamp(14px,1.5vw,18px)", marginTop: "28px", maxWidth: "520px", lineHeight: 1.75, textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
             Your stay and car rental — matched by location and timing. Nobody else does this.
           </p>
 
@@ -298,16 +301,16 @@ export default function HomePage() {
           <div
             className="fade-up d400"
             style={{
-              marginTop: "48px",
-              background: "rgba(255,255,255,0.97)",
-              borderRadius: "4px",
+              marginTop: "52px",
+              background: "rgba(255,255,255,0.98)",
+              borderRadius: "6px",
               display: "flex",
               flexWrap: "wrap",
               gap: "0",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+              boxShadow: "0 24px 80px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.15)",
               overflow: "hidden",
               width: "100%",
-              maxWidth: "720px",
+              maxWidth: "740px",
             }}
           >
             <div style={{ flex: "1 1 200px", display: "flex", alignItems: "center", gap: "10px", padding: "16px 20px", borderRight: "1px solid var(--color-gray-200)" }}>
@@ -392,12 +395,26 @@ export default function HomePage() {
       {surprisePair && <PairModal pair={surprisePair} onClose={() => setSurprisePair(null)} />}
 
       {/* ── TRUST BAR ── */}
-      <div style={{ background: "var(--color-mocha-pale)", borderBottom: "1px solid var(--color-gray-200)", padding: "18px 24px" }}>
-        <div style={{ maxWidth: "900px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "32px" }}>
-          <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.14em", color: "var(--color-gray-500)", textTransform: "uppercase", flexShrink: 0 }}>As seen in</span>
-          {["Forbes Travel", "CNN Travel", "Condé Nast", "Travel + Leisure", "The Points Guy"].map((pub) => (
-            <span key={pub} style={{ fontFamily: "var(--font-display)", fontSize: "14px", color: "var(--color-mocha-dark)", letterSpacing: "0.04em", whiteSpace: "nowrap" as const, fontStyle: "italic" }}>{pub}</span>
+      <div style={{ background: "var(--color-mocha-pale)", borderBottom: "1px solid var(--color-gray-200)", padding: "14px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "8px 32px" }}>
+          <span style={{ fontFamily: "var(--font-body)", fontSize: "10px", letterSpacing: "0.16em", color: "var(--color-gray-400)", textTransform: "uppercase", flexShrink: 0 }}>As seen in</span>
+          {[
+            { name: "Forbes Travel", icon: "🏅" },
+            { name: "CNN Travel", icon: "📡" },
+            { name: "Condé Nast", icon: "✦" },
+            { name: "Travel + Leisure", icon: "🌎" },
+            { name: "The Points Guy", icon: "💳" },
+          ].map((pub) => (
+            <span key={pub.name} style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "var(--font-display)", fontSize: "13px", color: "var(--color-mocha-dark)", letterSpacing: "0.03em", whiteSpace: "nowrap" as const, fontStyle: "italic" }}>
+              <span style={{ fontSize: "12px" }}>{pub.icon}</span>{pub.name}
+            </span>
           ))}
+          <div style={{ display: "flex", alignItems: "center", gap: "16px", paddingLeft: "16px", borderLeft: "1px solid var(--color-gray-300)", flexShrink: 0 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-black)", fontWeight: 600 }}>
+              <Star size={12} fill="#f59e0b" color="#f59e0b" /> 4.9 avg
+            </span>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-gray-600)", fontWeight: 500 }}>50K+ booked</span>
+          </div>
         </div>
       </div>
 
