@@ -34,13 +34,13 @@ function SavingsStrip() {
   }, []);
 
   return (
-    <div style={{ background: "var(--color-mocha)", padding: "18px 24px" }}>
+    <div style={{ background: "var(--color-mocha-pale)", borderBottom: "1px solid var(--color-gray-200)", padding: "18px 24px" }}>
       <div style={{ maxWidth: "900px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "8px 20px", textAlign: "center" }}>
-        <span style={{ fontFamily: "var(--font-display)", fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: 500, color: "white" }}>
+        <span style={{ fontFamily: "var(--font-display)", fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: 500, color: "var(--color-black)" }}>
           🎉 Pairlo travelers have saved{" "}
-          <span ref={ref} style={{ color: "#FFE4B5" }}>$0.0M+</span>
+          <span ref={ref} style={{ color: "var(--color-mocha)" }}>$0.0M+</span>
         </span>
-        <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "rgba(255,255,255,0.7)" }}>
+        <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--color-gray-500)" }}>
           vs. booking stays & cars separately
         </span>
       </div>
@@ -184,10 +184,10 @@ function AnimatedStat({ value, label }: { value: string; label: string }) {
 
   return (
     <div style={{ textAlign: "center" }}>
-      <p ref={ref} style={{ fontFamily: "var(--font-display)", fontSize: "clamp(28px, 3vw, 40px)", fontWeight: 500, color: "white", transition: "none" }}>
+      <p ref={ref} style={{ fontFamily: "var(--font-display)", fontSize: "clamp(28px, 3vw, 40px)", fontWeight: 500, color: "var(--color-black)", transition: "none" }}>
         {displayed}
       </p>
-      <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em", marginTop: "4px" }}>
+      <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-gray-500)", letterSpacing: "0.08em", marginTop: "4px" }}>
         {label.toUpperCase()}
       </p>
     </div>
@@ -196,7 +196,7 @@ function AnimatedStat({ value, label }: { value: string; label: string }) {
 
 function StatsStrip() {
   return (
-    <section style={{ background: "var(--color-black)", padding: "32px 24px" }}>
+    <section style={{ background: "var(--color-gray-100)", padding: "32px 24px", borderTop: "1px solid var(--color-gray-200)", borderBottom: "1px solid var(--color-gray-200)" }}>
       <div style={{ maxWidth: "900px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px" }}>
         {stats.map((s, i) => (
           <AnimatedStat key={i} value={s.value} label={s.label} />
@@ -239,7 +239,7 @@ export default function HomePage() {
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
         />
         {/* Overlay */}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(27,46,31,0.55) 0%, rgba(27,46,31,0.35) 50%, rgba(27,46,31,0.75) 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(20,20,20,0.38) 0%, rgba(20,20,20,0.18) 50%, rgba(20,20,20,0.55) 100%)" }} />
 
         {/* Hero content */}
         <div
@@ -392,11 +392,11 @@ export default function HomePage() {
       {surprisePair && <PairModal pair={surprisePair} onClose={() => setSurprisePair(null)} />}
 
       {/* ── TRUST BAR ── */}
-      <div style={{ background: "var(--color-black)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "18px 24px" }}>
+      <div style={{ background: "var(--color-mocha-pale)", borderBottom: "1px solid var(--color-gray-200)", padding: "18px 24px" }}>
         <div style={{ maxWidth: "900px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "32px" }}>
-          <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.14em", color: "rgba(255,255,255,0.3)", textTransform: "uppercase", flexShrink: 0 }}>As seen in</span>
+          <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.14em", color: "var(--color-gray-500)", textTransform: "uppercase", flexShrink: 0 }}>As seen in</span>
           {["Forbes Travel", "CNN Travel", "Condé Nast", "Travel + Leisure", "The Points Guy"].map((pub) => (
-            <span key={pub} style={{ fontFamily: "var(--font-display)", fontSize: "14px", color: "rgba(255,255,255,0.22)", letterSpacing: "0.04em", whiteSpace: "nowrap" as const, fontStyle: "italic" }}>{pub}</span>
+            <span key={pub} style={{ fontFamily: "var(--font-display)", fontSize: "14px", color: "var(--color-mocha-dark)", letterSpacing: "0.04em", whiteSpace: "nowrap" as const, fontStyle: "italic" }}>{pub}</span>
           ))}
         </div>
       </div>
@@ -559,13 +559,13 @@ export default function HomePage() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section style={{ background: "var(--color-black)", padding: "96px 24px" }}>
+      <section style={{ background: "var(--color-mocha-muted)", padding: "96px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "56px" }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", letterSpacing: "0.2em", color: "var(--color-mocha-light)", textTransform: "uppercase", marginBottom: "16px" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", letterSpacing: "0.2em", color: "var(--color-mocha)", textTransform: "uppercase", marginBottom: "16px" }}>
               Real Travelers
             </p>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 400, color: "white" }}>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 400, color: "var(--color-black)" }}>
               Don't take our word for it
             </h2>
           </div>
@@ -574,13 +574,14 @@ export default function HomePage() {
               <div
                 key={i}
                 style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: "white",
+                  border: "1px solid var(--color-gray-200)",
                   borderRadius: "4px",
                   padding: "28px",
                   display: "flex",
                   flexDirection: "column",
                   gap: "20px",
+                  boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
                 }}
               >
                 {/* Stars */}
@@ -595,7 +596,7 @@ export default function HomePage() {
                   fontSize: "16px",
                   fontWeight: 400,
                   fontStyle: "italic",
-                  color: "rgba(255,255,255,0.85)",
+                  color: "var(--color-black)",
                   lineHeight: 1.7,
                   flex: 1,
                 }}>
@@ -619,8 +620,8 @@ export default function HomePage() {
                     {t.avatar}
                   </div>
                   <div>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", fontWeight: 600, color: "white" }}>{t.name}</p>
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "rgba(255,255,255,0.4)" }}>{t.role}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", fontWeight: 600, color: "var(--color-black)" }}>{t.name}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-gray-500)" }}>{t.role}</p>
                   </div>
                 </div>
               </div>
@@ -630,8 +631,8 @@ export default function HomePage() {
       </section>
 
       {/* ── CTA STRIP ── */}
-      <section style={{ background: "var(--color-black)", padding: "80px 24px", textAlign: "center" }}>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", letterSpacing: "0.2em", color: "var(--color-mocha-light)", textTransform: "uppercase", marginBottom: "20px" }}>
+      <section style={{ background: "var(--color-mocha)", padding: "80px 24px", textAlign: "center" }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", letterSpacing: "0.2em", color: "rgba(255,255,255,0.7)", textTransform: "uppercase", marginBottom: "20px" }}>
           Launching October 2026
         </p>
         <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(32px, 4vw, 56px)", fontWeight: 400, color: "white", marginBottom: "16px" }}>
@@ -641,12 +642,12 @@ export default function HomePage() {
           fontFamily: "var(--font-display)",
           fontSize: "clamp(16px, 1.8vw, 22px)",
           fontStyle: "italic",
-          color: "var(--color-mocha-pale)",
+          color: "rgba(255,255,255,0.85)",
           marginBottom: "10px",
         }}>
           Your keys. Your wheels. One booking.
         </p>
-        <p style={{ fontFamily: "var(--font-body)", fontSize: "15px", color: "rgba(255,255,255,0.5)", maxWidth: "480px", margin: "0 auto 40px", lineHeight: 1.7 }}>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "15px", color: "rgba(255,255,255,0.65)", maxWidth: "480px", margin: "0 auto 40px", lineHeight: 1.7 }}>
           Join the waitlist and get early access when Pairlo launches.
         </p>
         <div style={{ display: "flex", gap: "0", maxWidth: "440px", margin: "0 auto", overflow: "hidden", borderRadius: "2px" }}>
@@ -655,8 +656,8 @@ export default function HomePage() {
             placeholder="your@email.com"
             style={{
               flex: 1,
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.12)",
+              background: "rgba(255,255,255,0.2)",
+              border: "1px solid rgba(255,255,255,0.3)",
               borderRight: "none",
               padding: "14px 18px",
               fontSize: "14px",
@@ -667,29 +668,29 @@ export default function HomePage() {
           />
           <button
             style={{
-              background: "var(--color-mocha)",
-              color: "white",
+              background: "white",
+              color: "var(--color-mocha)",
               border: "none",
               padding: "14px 28px",
               fontFamily: "var(--font-body)",
               fontSize: "14px",
-              fontWeight: 600,
+              fontWeight: 700,
               cursor: "pointer",
               letterSpacing: "0.06em",
               transition: "background 0.2s",
             }}
-            onMouseEnter={(e) => ((e.target as HTMLElement).style.background = "var(--color-mocha-light)")}
-            onMouseLeave={(e) => ((e.target as HTMLElement).style.background = "var(--color-mocha)")}
+            onMouseEnter={(e) => ((e.target as HTMLElement).style.background = "var(--color-mocha-pale)")}
+            onMouseLeave={(e) => ((e.target as HTMLElement).style.background = "white")}
           >
             JOIN
           </button>
         </div>
       </section>
       {/* ── STICKY MOBILE CTA ── */}
-      <div className="mobile-sticky-cta" style={{ display: "none", position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 500, background: "var(--color-black)", borderTop: "1px solid rgba(255,255,255,0.1)", padding: "12px 16px", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+      <div className="mobile-sticky-cta" style={{ display: "none", position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 500, background: "white", borderTop: "1px solid var(--color-gray-200)", boxShadow: "0 -4px 20px rgba(0,0,0,0.08)", padding: "12px 16px", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
         <div>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "rgba(255,255,255,0.5)", marginBottom: "2px" }}>Ready to travel?</p>
-          <p style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 500, color: "white" }}>Find your pair</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--color-gray-500)", marginBottom: "2px" }}>Ready to travel?</p>
+          <p style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontWeight: 500, color: "var(--color-black)" }}>Find your pair</p>
         </div>
         <Link to="/search">
           <button style={{ background: "var(--color-mocha)", color: "white", border: "none", padding: "12px 24px", borderRadius: "2px", fontFamily: "var(--font-body)", fontSize: "13px", fontWeight: 600, cursor: "pointer", letterSpacing: "0.06em", whiteSpace: "nowrap" as const }}>

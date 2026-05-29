@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --color-black:        #1B2E1F;
+  --color-black:        #111111;
   --color-white:        #FFFFFF;
   --color-mocha:        #7B5B3A;
-  --color-mocha-light:  #A67C52;
+  --color-mocha-light:  #9A7254;
   --color-mocha-dark:   #5A3F24;
-  --color-mocha-pale:   #F5EDE3;
-  --color-mocha-muted:  #EDE0D4;
-  --color-cream:        #F4F9F5;
-  --color-gray-100:     #EEF3EF;
-  --color-gray-200:     #D6E0D8;
-  --color-gray-500:     #6B7D6E;
-  --color-gray-700:     #2E3D30;
+  --color-mocha-pale:   #FAF7F4;
+  --color-mocha-muted:  #F2EDE8;
+  --color-cream:        #FDFBF9;
+  --color-gray-100:     #F5F5F5;
+  --color-gray-200:     #E0E0E0;
+  --color-gray-500:     #888888;
+  --color-gray-700:     #333333;
 
   --font-display: 'Playfair Display', Georgia, serif;
   --font-body:    'DM Sans', system-ui, sans-serif;

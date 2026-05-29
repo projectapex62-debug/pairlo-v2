@@ -46,16 +46,16 @@ export function Nav() {
       <nav
         style={{
           position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-          background: scrolled ? "var(--color-black)" : "rgba(27,46,31,0.85)",
+          background: scrolled ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.15)",
           backdropFilter: "blur(12px)",
-          borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
+          borderBottom: scrolled ? "1px solid var(--color-gray-200)" : "none",
           transition: "all 0.3s ease",
         }}
       >
         <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 24px", height: "72px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           {/* Logo */}
           <Link to="/">
-            <span style={{ fontFamily: "var(--font-display)", fontSize: "26px", fontWeight: 500, color: "var(--color-white)", letterSpacing: "0.06em", cursor: "pointer" }}>
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "26px", fontWeight: 500, color: scrolled ? "var(--color-black)" : "white", letterSpacing: "0.06em", cursor: "pointer", transition: "color 0.3s" }}>
               Pairlo
             </span>
           </Link>
@@ -64,7 +64,7 @@ export function Nav() {
           <div style={{ display: "flex", alignItems: "center", gap: "32px" }} className="hidden-mobile">
             {links.map((l) => (
               <Link key={l.href} to={l.href}>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: "14px", fontWeight: isActive(l.href) ? 500 : 400, color: isActive(l.href) ? "var(--color-white)" : "rgba(255,255,255,0.6)", cursor: "pointer", transition: "color 0.2s", letterSpacing: "0.02em", paddingBottom: "4px", borderBottom: isActive(l.href) ? "1px solid var(--color-mocha)" : "1px solid transparent", display: "inline-block" }}>
+                <span style={{ fontFamily: "var(--font-body)", fontSize: "14px", fontWeight: isActive(l.href) ? 500 : 400, color: isActive(l.href) ? (scrolled ? "var(--color-black)" : "white") : (scrolled ? "var(--color-gray-500)" : "rgba(255,255,255,0.75)"), cursor: "pointer", transition: "color 0.2s", letterSpacing: "0.02em", paddingBottom: "4px", borderBottom: isActive(l.href) ? "1px solid var(--color-mocha)" : "1px solid transparent", display: "inline-block" }}>
                   {l.label}
                 </span>
               </Link>
@@ -76,7 +76,7 @@ export function Nav() {
             {/* Wishlist */}
             <Link to="/wishlist">
               <div style={{ position: "relative", width: "34px", height: "34px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }} title="Saved pairs">
-                <Heart size={17} color={wishlistCount > 0 ? "#e8684a" : "rgba(255,255,255,0.55)"} fill={wishlistCount > 0 ? "#e8684a" : "none"} style={{ transition: "all 0.2s" }} />
+                <Heart size={17} color={wishlistCount > 0 ? "#e8684a" : (scrolled ? "var(--color-gray-500)" : "rgba(255,255,255,0.65)")} fill={wishlistCount > 0 ? "#e8684a" : "none"} style={{ transition: "all 0.2s" }} />
                 {wishlistCount > 0 && (
                   <span style={{
                     position: "absolute", top: "-3px", right: "-3px",
@@ -95,25 +95,25 @@ export function Nav() {
             <button
               onClick={() => setDark((d) => !d)}
               title={dark ? "Light mode" : "Dark mode"}
-              style={{ width: "34px", height: "34px", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.18)", background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-mocha)"; (e.currentTarget as HTMLElement).style.background = "rgba(123,91,58,0.15)"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.18)"; (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+              style={{ width: "34px", height: "34px", borderRadius: "2px", border: `1px solid ${scrolled ? "var(--color-gray-200)" : "rgba(255,255,255,0.25)"}`, background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-mocha)"; (e.currentTarget as HTMLElement).style.background = "var(--color-mocha-pale)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = scrolled ? "var(--color-gray-200)" : "rgba(255,255,255,0.25)"; (e.currentTarget as HTMLElement).style.background = "transparent"; }}
             >
-              {dark ? <Sun size={15} color="rgba(255,255,255,0.7)" /> : <Moon size={15} color="rgba(255,255,255,0.7)" />}
+              {dark ? <Sun size={15} color={scrolled ? "var(--color-gray-500)" : "rgba(255,255,255,0.7)"} /> : <Moon size={15} color={scrolled ? "var(--color-gray-500)" : "rgba(255,255,255,0.7)"} />}
             </button>
 
             <Link to="/faq">
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "rgba(255,255,255,0.55)", cursor: "pointer", letterSpacing: "0.02em", transition: "color 0.2s" }}
-                onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "white")}
-                onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "rgba(255,255,255,0.55)")}
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: scrolled ? "var(--color-gray-500)" : "rgba(255,255,255,0.65)", cursor: "pointer", letterSpacing: "0.02em", transition: "color 0.2s" }}
+                onMouseEnter={(e) => ((e.target as HTMLElement).style.color = scrolled ? "var(--color-black)" : "white")}
+                onMouseLeave={(e) => ((e.target as HTMLElement).style.color = scrolled ? "var(--color-gray-500)" : "rgba(255,255,255,0.65)")}
               >
                 FAQ
               </span>
             </Link>
             <Link to="/contact">
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "rgba(255,255,255,0.55)", cursor: "pointer", letterSpacing: "0.02em", transition: "color 0.2s" }}
-                onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "white")}
-                onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "rgba(255,255,255,0.55)")}
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: scrolled ? "var(--color-gray-500)" : "rgba(255,255,255,0.65)", cursor: "pointer", letterSpacing: "0.02em", transition: "color 0.2s" }}
+                onMouseEnter={(e) => ((e.target as HTMLElement).style.color = scrolled ? "var(--color-black)" : "white")}
+                onMouseLeave={(e) => ((e.target as HTMLElement).style.color = scrolled ? "var(--color-gray-500)" : "rgba(255,255,255,0.65)")}
               >
                 Contact
               </span>
