@@ -255,8 +255,8 @@ export default function HomePage() {
             padding: "0 24px",
           }}
         >
-          <div className="fade-in d100" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(123,91,58,0.35)", backdropFilter: "blur(8px)", border: "1px solid rgba(123,91,58,0.5)", borderRadius: "100px", padding: "6px 18px", marginBottom: "28px" }}>
-            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#7B5B3A", boxShadow: "0 0 8px rgba(123,91,58,0.8)", display: "inline-block" }} />
+          <div className="fade-in d100" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(138,158,123,0.35)", backdropFilter: "blur(8px)", border: "1px solid rgba(138,158,123,0.5)", borderRadius: "100px", padding: "6px 18px", marginBottom: "28px" }}>
+            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#8A9E7B", boxShadow: "0 0 8px rgba(138,158,123,0.8)", display: "inline-block" }} />
             <span style={{ color: "rgba(255,255,255,0.9)", fontFamily: "var(--font-body)", fontSize: "12px", letterSpacing: "0.16em", textTransform: "uppercase" }}>The smarter way to travel</span>
           </div>
           <h1
@@ -559,7 +559,7 @@ export default function HomePage() {
             <Link key={tool.href} to={tool.href}>
               <div
                 style={{ display: "flex", alignItems: "center", gap: "14px", background: "white", border: "1px solid var(--color-gray-200)", borderRadius: "4px", padding: "16px 24px", cursor: "pointer", transition: "all 0.2s", minWidth: "240px" }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-mocha)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 16px rgba(123,91,58,0.12)"; }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-mocha)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 16px rgba(138,158,123,0.12)"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-gray-200)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
               >
                 <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: "var(--color-mocha-pale)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "var(--color-mocha)" }}>

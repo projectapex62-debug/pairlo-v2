@@ -122,7 +122,7 @@ function MapView({ pairs, onPinClick, activePinId }: {
                 fontFamily: "var(--font-body)",
                 fontWeight: 600,
                 cursor: "pointer",
-                boxShadow: isActive ? "0 4px 16px rgba(123,91,58,0.5)" : "0 2px 8px rgba(0,0,0,0.3)",
+                boxShadow: isActive ? "0 4px 16px rgba(138,158,123,0.5)" : "0 2px 8px rgba(0,0,0,0.3)",
                 transform: `translate(-50%, -100%) scale(${isActive ? 1.15 : 1})`,
                 transition: "all 0.2s",
                 zIndex: isActive ? 10 : 1,

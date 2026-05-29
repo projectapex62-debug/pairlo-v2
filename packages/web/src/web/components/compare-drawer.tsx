@@ -79,7 +79,7 @@ export function CompareDrawer() {
                   <div
                     key={pair.id}
                     style={{
-                      background: isCheaper ? "rgba(139,94,60,0.06)" : "white",
+                      background: isCheaper ? "rgba(138,158,123,0.06)" : "white",
                       borderRight: i === 0 ? "1px solid var(--color-gray-200)" : "none",
                       borderBottom: "1px solid var(--color-gray-200)",
                       padding: "16px",

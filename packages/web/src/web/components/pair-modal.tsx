@@ -261,7 +261,7 @@ export function PairModal({ pair, onClose }: PairModalProps) {
 
               {/* Why this car */}
               {(pair as any).carMatchReason && (
-                <div style={{ background: "rgba(139,94,60,0.06)", border: "1px solid rgba(139,94,60,0.18)", borderRadius: "3px", padding: "14px 16px", marginTop: "18px", display: "flex", gap: "12px", alignItems: "flex-start" }}>
+                <div style={{ background: "rgba(138,158,123,0.06)", border: "1px solid rgba(138,158,123,0.18)", borderRadius: "3px", padding: "14px 16px", marginTop: "18px", display: "flex", gap: "12px", alignItems: "flex-start" }}>
                   <span style={{ fontSize: "18px", flexShrink: 0 }}>🔑</span>
                   <div>
                     <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-mocha)", marginBottom: "5px" }}>Why this car</p>

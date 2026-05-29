@@ -96,8 +96,8 @@ export function LiveActivityToast() {
             {current.pair}
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            <MapPin size={9} color="var(--color-mocha, #7B5B3A)" />
-            <span style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "10px", color: "var(--color-mocha, #7B5B3A)" }}>
+            <MapPin size={9} color="var(--color-mocha, #8A9E7B)" />
+            <span style={{ fontFamily: "var(--font-body, sans-serif)", fontSize: "10px", color: "var(--color-mocha, #8A9E7B)" }}>
               {current.dest}
             </span>
           </div>

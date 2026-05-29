@@ -49,7 +49,7 @@ export function Footer() {
                   }}
                   onMouseEnter={(e) => {
                     (e.currentTarget as HTMLElement).style.borderColor = "var(--color-mocha)";
-                    (e.currentTarget as HTMLElement).style.background = "rgba(123,91,58,0.15)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(138,158,123,0.15)";
                   }}
                   onMouseLeave={(e) => {
                     (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.15)";

@@ -227,7 +227,7 @@ export function PairCard({ pair, featured = false, onCompareChange }: {
                 title={inCompare ? "Remove from compare" : maxedOut ? "Max 2 pairs" : "Add to compare"}
                 style={{
                   width: "32px", height: "32px", borderRadius: "50%",
-                  background: inCompare ? "rgba(139,94,60,0.9)" : maxedOut ? "rgba(220,38,38,0.8)" : "rgba(255,255,255,0.88)",
+                  background: inCompare ? "rgba(138,158,123,0.9)" : maxedOut ? "rgba(220,38,38,0.8)" : "rgba(255,255,255,0.88)",
                   border: "none", cursor: "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   backdropFilter: "blur(4px)",
@@ -291,7 +291,7 @@ export function PairCard({ pair, featured = false, onCompareChange }: {
             />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(27,46,31,0.65) 0%, rgba(27,46,31,0.15) 60%)" }} />
             <div style={{ position: "absolute", top: 10, left: 12 }}>
-              <span style={{ background: "rgba(123,91,58,0.85)", color: "white", fontSize: "10px", padding: "3px 9px", borderRadius: "2px", backdropFilter: "blur(4px)", fontFamily: "var(--font-body)", letterSpacing: "0.08em" }}>
+              <span style={{ background: "rgba(138,158,123,0.85)", color: "white", fontSize: "10px", padding: "3px 9px", borderRadius: "2px", backdropFilter: "blur(4px)", fontFamily: "var(--font-body)", letterSpacing: "0.08em" }}>
                 CAR
               </span>
             </div>

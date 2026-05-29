@@ -132,7 +132,7 @@ export default function RewardsPage() {
                   padding: "40px 32px",
                   position: "relative",
                   overflow: "hidden",
-                  ...(tier.featured ? { transform: "scale(1.03)", boxShadow: "0 12px 48px rgba(123,91,58,0.18)" } : {}),
+                  ...(tier.featured ? { transform: "scale(1.03)", boxShadow: "0 12px 48px rgba(138,158,123,0.18)" } : {}),
                 }}
               >
                 {tier.featured && (

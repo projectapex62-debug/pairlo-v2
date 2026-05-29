@@ -87,7 +87,7 @@ function getPairMatch(answers: Record<string, string>) {
   return allPairs.find((p) => p.id === best) ?? allPairs[0];
 }
 
-const PROGRESS_COLORS = ["#7B5B3A", "#8B6B4A", "#9B7B5A", "#AB8B6A"];
+const PROGRESS_COLORS = ["#8A9E7B", "#8A9E7B", "#A8BB9C", "#A8BB9C"];
 
 export default function Quiz() {
   const [, navigate] = useLocation();

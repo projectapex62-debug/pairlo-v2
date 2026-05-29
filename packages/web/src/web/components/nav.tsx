@@ -55,7 +55,7 @@ export function Nav() {
       {bannerVisible && (
         <div style={{
           position: "fixed", top: 0, left: 0, right: 0, zIndex: 101,
-          height: "40px", background: "linear-gradient(90deg, #5A3F24 0%, #7B5B3A 50%, #5A3F24 100%)",
+          height: "40px", background: "linear-gradient(90deg, #6B7D5E 0%, #8A9E7B 50%, #6B7D5E 100%)",
           display: "flex", alignItems: "center", justifyContent: "center",
           padding: "0 48px",
         }}>
@@ -218,7 +218,7 @@ export function Nav() {
           --color-gray-500: #8a9a8a;
           --color-gray-600: #aabcaa;
           --color-black: #1B2E1F;
-          --color-mocha-pale: rgba(123,91,58,0.18);
+          --color-mocha-pale: rgba(138,158,123,0.18);
           --color-mocha-dark: #c49a6c;
         }
       `}</style>
