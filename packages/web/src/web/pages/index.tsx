@@ -276,7 +276,7 @@ export default function HomePage() {
             Zero Hassle.
           </h1>
           <p className="fade-up d300" style={{ color: "rgba(255,255,255,0.72)", fontFamily: "var(--font-body)", fontSize: "clamp(14px,1.5vw,18px)", marginTop: "28px", maxWidth: "520px", lineHeight: 1.75, textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
-            Your stay and car rental — matched by location and timing. Nobody else does this.
+            Every great trip starts with the right place to stay and the right car to explore it. We find both.
           </p>
 
           {/* Catchphrase */}
