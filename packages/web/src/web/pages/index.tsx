@@ -554,7 +554,6 @@ export default function HomePage() {
           {[
             { icon: <Calculator size={16} />, label: "Trip Cost Calculator", sub: "See exactly what you'll pay", href: "/trip-calculator" },
             { icon: <HelpCircle size={16} />, label: "What's Your Pair Style?", sub: "Take the quiz → get matched", href: "/quiz" },
-            { icon: <Shuffle size={16} />, label: "Surprise Me", sub: "Random pair, curated for you", href: "/search" },
           ].map((tool) => (
             <Link key={tool.href} to={tool.href}>
               <div
@@ -572,6 +571,21 @@ export default function HomePage() {
               </div>
             </Link>
           ))}
+          {/* Surprise Me — opens modal directly instead of navigating */}
+          <div
+            onClick={() => { const r = allPairs[Math.floor(Math.random() * allPairs.length)]; setSurprisePair(r); }}
+            style={{ display: "flex", alignItems: "center", gap: "14px", background: "white", border: "1px solid var(--color-gray-200)", borderRadius: "4px", padding: "16px 24px", cursor: "pointer", transition: "all 0.2s", minWidth: "240px" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-mocha)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 16px rgba(138,158,123,0.12)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-gray-200)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
+          >
+            <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: "var(--color-mocha-pale)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "var(--color-mocha)" }}>
+              <Shuffle size={16} />
+            </div>
+            <div>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", fontWeight: 600, color: "var(--color-black)" }}>Surprise Me</p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--color-gray-400)" }}>Random pair, curated for you</p>
+            </div>
+          </div>
         </div>
       </section>
 
