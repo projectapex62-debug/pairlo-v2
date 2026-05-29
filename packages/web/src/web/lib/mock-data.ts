@@ -2,6 +2,17 @@ export const destinations = [
   { id: "malibu", name: "Malibu, CA", image: "/dest-beach.jpg", pairs: 24, tag: "Beach" },
   { id: "aspen", name: "Aspen, CO", image: "/dest-mountain.jpg", pairs: 18, tag: "Mountain" },
   { id: "nashville", name: "Nashville, TN", image: "/dest-city.jpg", pairs: 31, tag: "City" },
+  { id: "miami", name: "Miami, FL", image: "/dest-beach.jpg", pairs: 21, tag: "Beach" },
+  { id: "new-york", name: "New York, NY", image: "/dest-city.jpg", pairs: 44, tag: "City" },
+  { id: "chicago", name: "Chicago, IL", image: "/dest-city.jpg", pairs: 27, tag: "City" },
+  { id: "scottsdale", name: "Scottsdale, AZ", image: "/dest-mountain.jpg", pairs: 19, tag: "Desert" },
+  { id: "san-francisco", name: "San Francisco, CA", image: "/dest-city.jpg", pairs: 22, tag: "City" },
+  { id: "new-orleans", name: "New Orleans, LA", image: "/dest-city.jpg", pairs: 16, tag: "Culture" },
+  { id: "denver", name: "Denver, CO", image: "/dest-mountain.jpg", pairs: 20, tag: "Mountain" },
+  { id: "sedona", name: "Sedona, AZ", image: "/dest-mountain.jpg", pairs: 14, tag: "Adventure" },
+  { id: "charleston", name: "Charleston, SC", image: "/dest-beach.jpg", pairs: 17, tag: "Historic" },
+  { id: "austin", name: "Austin, TX", image: "/dest-city.jpg", pairs: 23, tag: "City" },
+  { id: "kauai", name: "Kauai, HI", image: "/dest-beach.jpg", pairs: 12, tag: "Tropical" },
 ];
 
 export const featuredPairs = [

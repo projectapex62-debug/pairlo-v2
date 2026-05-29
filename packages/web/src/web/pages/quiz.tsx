@@ -49,28 +49,28 @@ const QUESTIONS = [
 // Scoring: each answer maps to a pair id
 const SCORE_MAP: Record<string, Record<string, string[]>> = {
   vibe: {
-    beach: ["pair-1", "pair-6"],
-    mountain: ["pair-2"],
-    city: ["pair-3", "pair-5"],
-    luxe: ["pair-4", "pair-6"],
+    beach: ["pair-1", "pair-6", "pair-15", "pair-13"],
+    mountain: ["pair-2", "pair-11", "pair-12"],
+    city: ["pair-3", "pair-5", "pair-7", "pair-10", "pair-14"],
+    luxe: ["pair-4", "pair-6", "pair-8", "pair-9"],
   },
   car: {
-    sports: ["pair-6", "pair-5"],
-    suv: ["pair-2", "pair-4"],
-    ev: ["pair-3", "pair-5"],
-    offroad: ["pair-2"],
+    sports: ["pair-6", "pair-5", "pair-12", "pair-14"],
+    suv: ["pair-2", "pair-4", "pair-8", "pair-9", "pair-13"],
+    ev: ["pair-3", "pair-7"],
+    offroad: ["pair-2", "pair-11"],
   },
   group: {
-    couple: ["pair-6", "pair-1"],
-    family: ["pair-4", "pair-2"],
-    friends: ["pair-3", "pair-5"],
-    solo: ["pair-5", "pair-1"],
+    couple: ["pair-6", "pair-1", "pair-10", "pair-12", "pair-15"],
+    family: ["pair-4", "pair-2", "pair-13"],
+    friends: ["pair-3", "pair-5", "pair-14"],
+    solo: ["pair-5", "pair-1", "pair-7", "pair-9"],
   },
   budget: {
-    budget: ["pair-3"],
-    mid: ["pair-2", "pair-1"],
-    premium: ["pair-4", "pair-6"],
-    ultra: ["pair-5", "pair-6"],
+    budget: ["pair-3", "pair-13"],
+    mid: ["pair-2", "pair-1", "pair-7", "pair-10"],
+    premium: ["pair-4", "pair-6", "pair-9", "pair-11", "pair-14"],
+    ultra: ["pair-5", "pair-6", "pair-8", "pair-12", "pair-15"],
   },
 };
 

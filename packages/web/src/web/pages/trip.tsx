@@ -305,7 +305,7 @@ export default function TripPage() {
 
       {/* Content */}
       <div style={{ maxWidth: "880px", margin: "0 auto", padding: "40px 24px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "32px", alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "32px", alignItems: "start" }} className="trip-grid">
 
           {/* ── Left column ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
@@ -576,6 +576,12 @@ export default function TripPage() {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .trip-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }
