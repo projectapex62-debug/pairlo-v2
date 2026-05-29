@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { X, Star, MapPin, Car, CheckCircle2, ArrowRight, Gauge, Fuel, Palette, Users, ChevronLeft, ChevronRight, ArrowDown } from "lucide-react";
+import { X, Star, MapPin, Car, CheckCircle2, ArrowRight, Gauge, Fuel, Palette, Users, ChevronLeft, ChevronRight, ArrowDown, Share2 } from "lucide-react";
 import { PairCardData } from "./pair-card";
+import { PairScoreBadge } from "./pair-score-badge";
 
 interface PairModalProps {
   pair: PairCardData;
@@ -10,7 +11,16 @@ interface PairModalProps {
 
 export function PairModal({ pair, onClose }: PairModalProps) {
   const [, navigate] = useLocation();
+  const [shareCopied, setShareCopied] = useState(false);
   const grandTotal = pair.stay.price * pair.totalNights + pair.car.price * pair.totalDays;
+
+  const handleShare = () => {
+    const url = `${window.location.origin}/trip/${pair.id}-${pair.totalNights}n`;
+    navigator.clipboard.writeText(url).then(() => {
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    });
+  };
   const separateTotal = (pair as any).separatePrice
     ? (pair as any).separatePrice * pair.totalNights + pair.car.price * pair.totalDays * 1.18
     : null;
@@ -282,7 +292,20 @@ export function PairModal({ pair, onClose }: PairModalProps) {
           {/* Right col — booking summary */}
           <div>
             <div style={{ border: "1px solid var(--color-gray-200)", borderRadius: "4px", padding: "24px", position: "sticky", top: "24px" }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.12em", color: "var(--color-mocha)", textTransform: "uppercase", marginBottom: "16px" }}>Pair Summary</p>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.12em", color: "var(--color-mocha)", textTransform: "uppercase" }}>Pair Summary</p>
+                <PairScoreBadge
+                  stayPrice={pair.stay.price}
+                  carPrice={pair.car.price}
+                  separatePrice={(pair as any).separatePrice}
+                  totalNights={pair.totalNights}
+                  stayTags={pair.stay.tags}
+                  carType={pair.car.type}
+                  stayRating={pair.stay.rating}
+                  badge={(pair as any).badge}
+                  size="sm"
+                />
+              </div>
 
               {/* Savings callout */}
               {savings && savings > 0 && (
@@ -325,6 +348,16 @@ export function PairModal({ pair, onClose }: PairModalProps) {
                 onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--color-mocha)")}
               >
                 BOOK THIS PAIR <ArrowRight size={15} />
+              </button>
+
+              <button
+                onClick={handleShare}
+                style={{ width: "100%", background: "transparent", color: "var(--color-gray-600)", border: "1px solid var(--color-gray-200)", padding: "10px", borderRadius: "2px", fontFamily: "var(--font-body)", fontSize: "12px", fontWeight: 600, cursor: "pointer", letterSpacing: "0.06em", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", transition: "all 0.2s", marginBottom: "10px" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-mocha)"; (e.currentTarget as HTMLElement).style.color = "var(--color-mocha)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-gray-200)"; (e.currentTarget as HTMLElement).style.color = "var(--color-gray-600)"; }}
+              >
+                <Share2 size={13} />
+                {shareCopied ? "LINK COPIED!" : "SHARE THIS PAIR"}
               </button>
 
               <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--color-gray-400)", textAlign: "center", lineHeight: 1.6 }}>

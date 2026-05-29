@@ -3,6 +3,7 @@ import { Star, MapPin, Car, Zap, TrendingUp, Sparkles, Tag, ArrowDown, Heart, Gi
 import { PairModal } from "./pair-modal";
 import { toggleWishlist, isWishlisted } from "../lib/wishlist";
 import { toggleCompare, getCompare, COMPARE_EVENT } from "../lib/compare";
+import { PairScoreBadge } from "./pair-score-badge";
 
 export interface PairCardData {
   id: string;
@@ -236,6 +237,21 @@ export function PairCard({ pair, featured = false, onCompareChange }: {
               >
                 <GitCompare size={14} color={inCompare || maxedOut ? "white" : "var(--color-gray-600)"} strokeWidth={2} />
               </button>
+            </div>
+
+            {/* Pair Score Badge */}
+            <div style={{ position: "absolute", bottom: 42, right: 10 }}>
+              <PairScoreBadge
+                stayPrice={pair.stay.price}
+                carPrice={pair.car.price}
+                separatePrice={pair.separatePrice}
+                totalNights={pair.totalNights}
+                stayTags={pair.stay.tags}
+                carType={pair.car.type}
+                stayRating={pair.stay.rating}
+                badge={pair.badge}
+                size="sm"
+              />
             </div>
 
             {/* Rating */}

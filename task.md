@@ -1,38 +1,36 @@
-# Pairlo Big Feature Drop
+# Pairlo - Launch Ready Feature Drop
 
-## Pages to create
-- [x] /checkout — full checkout flow (step 1: details, step 2: payment, step 3: confirmation)
-- [ ] /wishlist — saved pairs page
-- [ ] /quiz — "What's your pair style?" 4-question quiz
-- [ ] /pair-of-the-week — editorial featured pair (can be section on homepage)
+## Sprint: Pair Score + SEO Pages + Shareable Links
 
-## Components to create
-- [ ] LiveActivityToast — bottom-left toast notifications ("Marcus just booked...")
-- [ ] SavingsCounter — animated global savings stat
-- [ ] SurpriseMe button — on homepage + search, picks random pair
+### 1. Pair Score Algorithm
+- [ ] Add `pairScore` to mock-data (computed from price, proximity, style match)
+- [ ] PairScore component — circular badge, 1–10, color coded (green=9+, amber=7+, red<7)
+- [ ] Show on PairCard + PairModal
+- [ ] Show breakdown tooltip (Price Match, Location Sync, Style Harmony, Value)
 
-## Homepage additions
-- [ ] "Surprise Me" CTA button near featured pairs
-- [ ] Savings counter strip
-- [ ] Pair of the Week section
-- [ ] Live activity toasts (global, mount in app.tsx)
+### 2. Shareable Trip Links
+- [ ] `/trip/:id` route — standalone page, no nav/footer
+- [ ] Shows full pair details, dates, cost breakdown
+- [ ] "Book This Trip" CTA → checkout
+- [ ] Copy link button + social share (Twitter, WhatsApp)
+- [ ] OG meta tags for rich link previews
 
-## Search additions
-- [ ] SurpriseMe button in results bar
+### 3. SEO City Landing Pages
+- [ ] `/pairs/:city` dynamic route — Miami, New York, Amalfi, Malibu, Nashville, Aspen
+- [ ] Each page: hero, filtered pairs for that city, local tips, FAQ
+- [ ] Sitemap-friendly URLs
+- [ ] Proper title/description meta per city
 
-## App.tsx
-- [ ] Add routes: /checkout, /wishlist, /quiz
-- [ ] Mount LiveActivityToast globally
+### 4. Wire up shareable link from checkout confirmation
+- [ ] After booking, show "Share your trip" button → `/trip/:bookingRef`
 
-## Nav / Footer
-- [ ] Add Wishlist link to nav (already has heart icon)
-- [ ] Add Quiz link
-
-## Done
-- FAQ page ✅
-- Blog page ✅
-- Price slider ✅
-- Sort by ✅
-- Empty state ✅
-- Page transitions ✅
-- Social links ✅
+## Files to create/edit
+- `lib/pair-score.ts` — scoring algorithm
+- `components/pair-score-badge.tsx` — UI component
+- `pages/trip.tsx` — shareable trip page
+- `pages/city.tsx` — dynamic city SEO page
+- `lib/mock-data.ts` — add pairScore + citySlug to pairs
+- `components/pair-card.tsx` — add score badge
+- `components/pair-modal.tsx` — add score breakdown
+- `pages/checkout.tsx` — add share link on confirmation
+- `app.tsx` — add /trip/:id and /pairs/:city routes

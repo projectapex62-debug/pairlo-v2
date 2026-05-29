@@ -18,6 +18,8 @@ import Checkout from "./pages/checkout";
 import Wishlist from "./pages/wishlist";
 import Quiz from "./pages/quiz";
 import TripCalculator from "./pages/trip-calculator";
+import Trip from "./pages/trip";
+import City from "./pages/city";
 
 function PageTransition({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -67,6 +69,8 @@ function App() {
           <Route path="/wishlist" component={Wishlist} />
           <Route path="/quiz" component={Quiz} />
           <Route path="/trip-calculator" component={TripCalculator} />
+          <Route path="/trip/:id" component={Trip} />
+          <Route path="/pairs/:city" component={City} />
         </Switch>
       </PageTransition>
       <Footer />
