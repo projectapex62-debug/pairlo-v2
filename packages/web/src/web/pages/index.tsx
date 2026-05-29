@@ -431,7 +431,7 @@ export default function HomePage() {
       </section>
 
       {/* ── DESTINATIONS ── */}
-      <section style={{ background: "var(--color-mocha-muted)", padding: "96px 24px" }}>
+      <section style={{ background: "var(--color-gray-100)", padding: "96px 24px" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "48px" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", letterSpacing: "0.2em", color: "var(--color-mocha)", textTransform: "uppercase", marginBottom: "12px" }}>
@@ -559,7 +559,7 @@ export default function HomePage() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section style={{ background: "var(--color-mocha-muted)", padding: "96px 24px" }}>
+      <section style={{ background: "var(--color-gray-100)", padding: "96px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "56px" }}>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", letterSpacing: "0.2em", color: "var(--color-mocha)", textTransform: "uppercase", marginBottom: "16px" }}>
