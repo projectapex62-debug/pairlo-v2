@@ -391,35 +391,13 @@ export default function TripPage() {
               </div>
             </div>
 
-            {/* 5. Hotel Overview — Policies + Amenities */}
-            <div style={{ background: "white", borderRadius: "6px", overflow: "hidden", border: "1px solid var(--color-gray-200)" }}>
-              <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--color-gray-100)" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--color-mocha)", fontWeight: 600 }}>Hotel Overview</p>
-              </div>
-              {/* Policies */}
-              <div style={{ padding: "0 24px" }}>
-                {[
-                  { label: "Check-in", value: details.checkIn },
-                  { label: "Check-out", value: details.checkOut },
-                  { label: "Currency", value: details.currency },
-                  { label: "Smoking", value: details.smoking },
-                  { label: "Pets", value: details.pets },
-                  { label: "Families", value: details.families },
-                ].map((row, i, arr) => (
-                  <div key={row.label} style={{ display: "flex", gap: "16px", padding: "13px 0", borderBottom: i < arr.length - 1 ? "1px solid var(--color-gray-100)" : "none" }}>
-                    <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-gray-400)", minWidth: "72px", flexShrink: 0 }}>{row.label}</span>
-                    <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-black)" }}>{row.value}</span>
-                  </div>
-                ))}
-              </div>
-              {/* Amenity chips */}
-              <div style={{ padding: "16px 24px", borderTop: "1px solid var(--color-gray-100)", background: "var(--color-cream)", display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                {details.amenityChips.map(a => (
-                  <span key={a.label} style={{ display: "inline-flex", alignItems: "center", gap: "5px", background: "white", border: "1px solid var(--color-gray-200)", borderRadius: "20px", padding: "4px 12px", fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--color-gray-500)" }}>
-                    {a.icon}{a.label}
-                  </span>
-                ))}
-              </div>
+            {/* 5. Hotel amenity chips — condensed, no policy table */}
+            <div style={{ background: "var(--color-cream)", borderRadius: "6px", padding: "14px 16px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
+              {details.amenityChips.map(a => (
+                <span key={a.label} style={{ display: "inline-flex", alignItems: "center", gap: "5px", background: "white", border: "1px solid var(--color-gray-200)", borderRadius: "20px", padding: "4px 12px", fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--color-gray-500)" }}>
+                  {a.icon}{a.label}
+                </span>
+              ))}
             </div>
 
             {/* 6. Drive Time */}
@@ -481,8 +459,8 @@ export default function TripPage() {
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--color-mocha-light)", fontWeight: 600 }}>Local Intel</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "rgba(255,255,255,0.35)", marginTop: "3px" }}>Curated tips — not on TripAdvisor</p>
               </div>
-              {details.localIntel.map((tip, i) => (
-                <div key={i} style={{ display: "flex", gap: "14px", padding: "16px 24px", borderBottom: i < details.localIntel.length - 1 ? "1px solid rgba(255,255,255,0.07)" : "none" }}>
+              {details.localIntel.slice(0, 2).map((tip, i) => (
+                <div key={i} style={{ display: "flex", gap: "14px", padding: "16px 24px", borderBottom: i < Math.min(details.localIntel.length, 2) - 1 ? "1px solid rgba(255,255,255,0.07)" : "none" }}>
                   <span style={{ fontFamily: "var(--font-display)", fontSize: "18px", color: "var(--color-mocha)", lineHeight: 1, marginTop: "1px", flexShrink: 0 }}>{i + 1}</span>
                   <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "rgba(255,255,255,0.75)", lineHeight: 1.6 }}>{tip}</span>
                 </div>
@@ -504,11 +482,6 @@ export default function TripPage() {
               ))}
             </div>
 
-            {/* 10. Why This Pair Works */}
-            <div style={{ background: "var(--color-black)", borderRadius: "6px", padding: "24px", color: "white" }}>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.14em", color: "var(--color-mocha-light)", textTransform: "uppercase", marginBottom: "10px" }}>Why This Pair Works</p>
-              <p style={{ fontFamily: "var(--font-display)", fontSize: "16px", fontStyle: "italic", lineHeight: 1.7, color: "rgba(255,255,255,0.85)" }}>"{pair.carMatchReason}"</p>
-            </div>
 
           </div>
 
