@@ -48,7 +48,7 @@ export default function AboutPage() {
         <div style={{ maxWidth: "1100px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "center" }}>
           <div>
             <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", letterSpacing: "0.2em", color: "var(--color-mocha)", textTransform: "uppercase", marginBottom: "16px" }}>
-              Founded 2024
+              Founded 2025
             </p>
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(28px,3.5vw,46px)", fontWeight: 400, marginBottom: "24px", lineHeight: 1.15 }}>
               One missed shuttle.<br />
@@ -79,7 +79,7 @@ export default function AboutPage() {
               background: "var(--color-black)", padding: "24px 28px", borderRadius: "4px",
               boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
             }}>
-              <p style={{ fontFamily: "var(--font-display)", fontSize: "32px", fontWeight: 400, color: "white" }}>2024</p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: "32px", fontWeight: 400, color: "white" }}>2025</p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "rgba(255,255,255,0.45)", letterSpacing: "0.1em" }}>FOUNDED</p>
             </div>
           </div>
