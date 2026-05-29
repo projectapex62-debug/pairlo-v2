@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { useLocation } from "wouter";
 import { Star, MapPin, Car, Zap, TrendingUp, Sparkles, Tag, ArrowDown, Heart, GitCompare, Clock } from "lucide-react";
-import { PairModal } from "./pair-modal";
 import { toggleWishlist, isWishlisted } from "../lib/wishlist";
 import { toggleCompare, getCompare, COMPARE_EVENT } from "../lib/compare";
 import { PairScoreBadge } from "./pair-score-badge";
@@ -105,7 +105,7 @@ export function PairCard({ pair, featured = false, onCompareChange }: {
   featured?: boolean;
   onCompareChange?: () => void;
 }) {
-  const [modalOpen, setModalOpen] = useState(false);
+  const [, navigate] = useLocation();
   const [wishlisted, setWishlisted] = useState(() => isWishlisted(pair.id));
   const [inCompare, setInCompare] = useState(() => getCompare().includes(pair.id));
   const [showTooltip, setShowTooltip] = useState(false);
@@ -166,7 +166,7 @@ export function PairCard({ pair, featured = false, onCompareChange }: {
           (e.currentTarget as HTMLElement).style.boxShadow = featured ? "0 8px 40px rgba(0,0,0,0.10)" : "0 2px 12px rgba(0,0,0,0.05)";
           (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
         }}
-        onClick={() => setModalOpen(true)}
+        onClick={() => navigate(`/trip/${pair.id}-${pair.totalNights}n`)}
       >
         {/* Compare indicator strip */}
         {inCompare && (
@@ -394,7 +394,7 @@ export function PairCard({ pair, featured = false, onCompareChange }: {
               }}
               onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--color-mocha)")}
               onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--color-black)")}
-              onClick={(e) => { e.stopPropagation(); setModalOpen(true); }}
+              onClick={(e) => { e.stopPropagation(); navigate(`/trip/${pair.id}-${pair.totalNights}n`); }}
             >
               Book Pair
             </button>
@@ -402,7 +402,6 @@ export function PairCard({ pair, featured = false, onCompareChange }: {
         </div>
       </div>
 
-      {modalOpen && <PairModal pair={pair} onClose={() => setModalOpen(false)} />}
     </>
   );
 }
