@@ -20,6 +20,8 @@ import Quiz from "./pages/quiz";
 import TripCalculator from "./pages/trip-calculator";
 import Trip from "./pages/trip";
 import City from "./pages/city";
+import Privacy from "./pages/privacy";
+import Terms from "./pages/terms";
 
 function PageTransition({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -71,6 +73,8 @@ function App() {
           <Route path="/trip-calculator" component={TripCalculator} />
           <Route path="/trip/:id" component={Trip} />
           <Route path="/pairs/:city" component={City} />
+          <Route path="/privacy" component={Privacy} />
+          <Route path="/terms" component={Terms} />
         </Switch>
       </PageTransition>
       <Footer />

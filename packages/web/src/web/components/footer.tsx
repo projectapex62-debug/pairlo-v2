@@ -190,16 +190,20 @@ export function Footer() {
             </div>
           </div>
           <div className="flex gap-6">
-            {["Privacy Policy", "Terms of Service", "Sitemap"].map((t) => (
-              <span
-                key={t}
-                className="text-xs cursor-pointer"
-                style={{ color: "rgba(255,255,255,0.25)", fontFamily: "var(--font-body)", transition: "color 0.2s" }}
-                onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "var(--color-mocha-light)")}
-                onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "rgba(255,255,255,0.25)")}
-              >
-                {t}
-              </span>
+            {[
+              { label: "Privacy Policy", href: "/privacy" },
+              { label: "Terms of Service", href: "/terms" },
+            ].map((t) => (
+              <Link key={t.href} to={t.href}>
+                <span
+                  className="text-xs cursor-pointer"
+                  style={{ color: "rgba(255,255,255,0.25)", fontFamily: "var(--font-body)", transition: "color 0.2s" }}
+                  onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "var(--color-mocha-light)")}
+                  onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "rgba(255,255,255,0.25)")}
+                >
+                  {t.label}
+                </span>
+              </Link>
             ))}
           </div>
         </div>
