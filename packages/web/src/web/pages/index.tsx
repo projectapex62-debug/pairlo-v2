@@ -395,25 +395,36 @@ export default function HomePage() {
       {surprisePair && <PairModal pair={surprisePair} onClose={() => setSurprisePair(null)} />}
 
       {/* ── TRUST BAR ── */}
-      <div style={{ background: "var(--color-mocha-pale)", borderBottom: "1px solid var(--color-gray-200)", padding: "14px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "8px 32px" }}>
-          <span style={{ fontFamily: "var(--font-body)", fontSize: "10px", letterSpacing: "0.16em", color: "var(--color-gray-400)", textTransform: "uppercase", flexShrink: 0 }}>As seen in</span>
-          {[
-            { name: "Forbes Travel", icon: "🏅" },
-            { name: "CNN Travel", icon: "📡" },
-            { name: "Condé Nast", icon: "✦" },
-            { name: "Travel + Leisure", icon: "🌎" },
-            { name: "The Points Guy", icon: "💳" },
-          ].map((pub) => (
-            <span key={pub.name} style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "var(--font-display)", fontSize: "13px", color: "var(--color-mocha-dark)", letterSpacing: "0.03em", whiteSpace: "nowrap" as const, fontStyle: "italic" }}>
-              <span style={{ fontSize: "12px" }}>{pub.icon}</span>{pub.name}
+      <div style={{ background: "white", borderBottom: "1px solid var(--color-gray-200)", padding: "18px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "0 40px", rowGap: "12px" }}>
+          {/* As seen in label */}
+          <span style={{ fontFamily: "var(--font-body)", fontSize: "9px", letterSpacing: "0.2em", color: "var(--color-gray-400)", textTransform: "uppercase", flexShrink: 0 }}>As seen in</span>
+
+          {/* Divider */}
+          <div style={{ width: "1px", height: "20px", background: "var(--color-gray-200)", flexShrink: 0 }} />
+
+          {/* Publications */}
+          {["Forbes Travel", "CNN Travel", "Condé Nast", "Travel + Leisure", "The Points Guy"].map((pub, i, arr) => (
+            <span key={pub} style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontStyle: "italic", color: "var(--color-gray-500)", letterSpacing: "0.02em", whiteSpace: "nowrap" as const, display: "inline-flex", alignItems: "center", gap: "40px" }}>
+              {pub}
+              {i < arr.length - 1 && <span style={{ display: "inline-block", width: "3px", height: "3px", borderRadius: "50%", background: "var(--color-gray-300)", marginLeft: "0" }} />}
             </span>
           ))}
-          <div style={{ display: "flex", alignItems: "center", gap: "16px", paddingLeft: "16px", borderLeft: "1px solid var(--color-gray-300)", flexShrink: 0 }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-black)", fontWeight: 600 }}>
-              <Star size={12} fill="#f59e0b" color="#f59e0b" /> 4.9 avg
+
+          {/* Divider */}
+          <div style={{ width: "1px", height: "20px", background: "var(--color-gray-200)", flexShrink: 0 }} />
+
+          {/* Stats */}
+          <div style={{ display: "flex", alignItems: "center", gap: "24px", flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+              {[1,2,3,4,5].map(s => <Star key={s} size={11} fill={s <= 4 ? "#f59e0b" : "none"} color="#f59e0b" strokeWidth={s === 5 ? 1.5 : 0} />)}
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", fontWeight: 700, color: "var(--color-black)", marginLeft: "3px" }}>4.9</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--color-gray-400)" }}>/ 5</span>
+            </div>
+            <span style={{ width: "1px", height: "14px", background: "var(--color-gray-200)", display: "inline-block" }} />
+            <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-gray-500)" }}>
+              <strong style={{ color: "var(--color-black)", fontWeight: 700 }}>50,000+</strong> trips booked
             </span>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-gray-600)", fontWeight: 500 }}>50K+ booked</span>
           </div>
         </div>
       </div>
