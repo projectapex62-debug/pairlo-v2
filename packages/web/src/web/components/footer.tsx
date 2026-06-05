@@ -1,11 +1,29 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Instagram, Twitter, Facebook } from "lucide-react";
+import { Instagram, Twitter, Facebook, CheckCircle } from "lucide-react";
 
 const CURRENCIES = ["USD", "EUR", "GBP", "CAD", "AUD"];
 
+const PARTNERS = [
+  { src: "/logo-expedia.png", alt: "Expedia", height: 22 },
+  { src: "/logo-booking.png", alt: "Booking.com", height: 20 },
+  { src: "/logo-hotels.png", alt: "Hotels.com", height: 26 },
+];
+
 export function Footer() {
   const [currency, setCurrency] = useState("USD");
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function handleWaitlist(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email) return;
+    setLoading(true);
+    await new Promise((r) => setTimeout(r, 800));
+    setLoading(false);
+    setSubmitted(true);
+  }
   return (
     <footer style={{ background: "var(--color-black)", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
       <div className="max-w-7xl mx-auto px-6 py-16">
@@ -117,43 +135,84 @@ export function Footer() {
             <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "var(--font-body)", lineHeight: 1.6 }}>
               Be first to know when we go live.
             </p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="your@email.com"
+            {submitted ? (
+              <div className="flex items-center gap-2" style={{ color: "var(--color-mocha-light)", fontFamily: "var(--font-body)", fontSize: "13px" }}>
+                <CheckCircle size={16} />
+                <span>You're on the list!</span>
+              </div>
+            ) : (
+              <form onSubmit={handleWaitlist} className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  style={{
+                    flex: 1,
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    borderRadius: "2px",
+                    padding: "10px 12px",
+                    fontSize: "13px",
+                    color: "white",
+                    fontFamily: "var(--font-body)",
+                    outline: "none",
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    background: "var(--color-mocha)",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "2px",
+                    padding: "10px 16px",
+                    fontSize: "13px",
+                    fontFamily: "var(--font-body)",
+                    cursor: loading ? "not-allowed" : "pointer",
+                    fontWeight: 500,
+                    opacity: loading ? 0.7 : 1,
+                    transition: "opacity 0.2s",
+                  }}
+                >
+                  {loading ? "..." : "Notify"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+
+        {/* Partner logos */}
+        <div
+          className="mt-12 pt-8 mb-8"
+          style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+        >
+          <p className="text-xs uppercase tracking-widest mb-5 text-center" style={{ color: "rgba(255,255,255,0.2)", fontFamily: "var(--font-body)" }}>
+            Prices sourced from
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-8">
+            {PARTNERS.map((p) => (
+              <img
+                key={p.alt}
+                src={p.src}
+                alt={p.alt}
                 style={{
-                  flex: 1,
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  borderRadius: "2px",
-                  padding: "10px 12px",
-                  fontSize: "13px",
-                  color: "white",
-                  fontFamily: "var(--font-body)",
-                  outline: "none",
+                  height: `${p.height}px`,
+                  opacity: 0.35,
+                  filter: "grayscale(1) brightness(2)",
+                  transition: "opacity 0.2s",
                 }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLImageElement).style.opacity = "0.65")}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLImageElement).style.opacity = "0.35")}
               />
-              <button
-                style={{
-                  background: "var(--color-mocha)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "2px",
-                  padding: "10px 16px",
-                  fontSize: "13px",
-                  fontFamily: "var(--font-body)",
-                  cursor: "pointer",
-                  fontWeight: 500,
-                }}
-              >
-                Notify
-              </button>
-            </div>
+            ))}
           </div>
         </div>
 
         <div
-          className="mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4"
+          className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4"
           style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
         >
           <div className="flex items-center gap-4">
