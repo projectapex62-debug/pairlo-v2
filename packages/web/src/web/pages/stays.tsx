@@ -11,10 +11,20 @@ const AMENITY_ICONS: Record<string, React.ReactNode> = {
 
 export default function StaysPage() {
   const [activeTag, setActiveTag] = useState("All");
-  const tags = ["All", "Beach", "Mountain", "City", "Resort"];
+  const tags = ["All", "Beach", "Mountain", "City", "Adventure", "Romantic"];
 
-  const hotels = allPairs.map((p) => p.hotel);
-  const unique = Array.from(new Map(hotels.map((h) => [h.id, h])).values());
+  // Deduplicate by hotel id, preserving the full pair so we can access stay.image
+  const seen = new Set<string>();
+  const allUnique = allPairs.filter((p) => {
+    if (seen.has(p.hotel.id)) return false;
+    seen.add(p.hotel.id);
+    return true;
+  });
+
+  // Filter by active tag
+  const unique = activeTag === "All"
+    ? allUnique
+    : allUnique.filter((p) => p.stay.tags.some((t) => t.toLowerCase().includes(activeTag.toLowerCase())));
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--color-white)", paddingTop: "72px" }}>
@@ -70,7 +80,10 @@ export default function StaysPage() {
       {/* ── STAYS GRID ── */}
       <section style={{ maxWidth: "1200px", margin: "0 auto", padding: "56px 24px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))", gap: "36px" }}>
-          {unique.map((hotel, i) => (
+          {unique.map((pair, i) => {
+            const hotel = pair.hotel;
+            const stayImage = pair.stay.image;
+            return (
             <div
               key={hotel.id}
               style={{
@@ -92,7 +105,7 @@ export default function StaysPage() {
               {/* Image */}
               <div style={{ position: "relative", height: "240px", overflow: "hidden" }}>
                 <img
-                  src={["/stay-1.jpg","/stay-2.jpg","/stay-3.jpg","/stay-4.jpg","/stay-5.jpg","/stay-6.jpg"][i % 6]}
+                  src={stayImage}
                   alt={hotel.name}
                   style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s ease" }}
                   onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
@@ -166,7 +179,8 @@ export default function StaysPage() {
                 </Link>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

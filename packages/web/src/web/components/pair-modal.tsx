@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { X, Star, MapPin, Car, CheckCircle2, ArrowRight, Gauge, Fuel, Palette, Users, ChevronLeft, ChevronRight, ArrowDown, Share2 } from "lucide-react";
 import { PairCardData } from "./pair-card";
-import { PairScoreBadge } from "./pair-score-badge";
 
 interface PairModalProps {
   pair: PairCardData;
@@ -292,20 +291,7 @@ export function PairModal({ pair, onClose }: PairModalProps) {
           {/* Right col — booking summary */}
           <div>
             <div style={{ border: "1px solid var(--color-gray-200)", borderRadius: "4px", padding: "24px", position: "sticky", top: "24px" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.12em", color: "var(--color-mocha)", textTransform: "uppercase" }}>Pair Summary</p>
-                <PairScoreBadge
-                  stayPrice={pair.stay.price}
-                  carPrice={pair.car.price}
-                  separatePrice={(pair as any).separatePrice}
-                  totalNights={pair.totalNights}
-                  stayTags={pair.stay.tags}
-                  carType={pair.car.type}
-                  stayRating={pair.stay.rating}
-                  badge={(pair as any).badge}
-                  size="sm"
-                />
-              </div>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.12em", color: "var(--color-mocha)", textTransform: "uppercase", marginBottom: "16px" }}>Pair Summary</p>
 
               {/* Savings callout */}
               {savings && savings > 0 && (
@@ -327,17 +313,12 @@ export function PairModal({ pair, onClose }: PairModalProps) {
                   <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--color-gray-500)" }}>Car · {pair.totalDays} days</span>
                   <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", fontWeight: 500 }}>${(pair.car.price * pair.totalDays).toLocaleString()}</span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--color-gray-500)" }}>Pairlo service fee</span>
-                  <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", fontWeight: 500, color: "var(--color-mocha)" }}>Free</span>
-                </div>
-              </div>
-
-              <div style={{ borderTop: "1px solid var(--color-gray-200)", paddingTop: "16px", marginBottom: "20px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--color-gray-500)" }}>Total</span>
-                <div style={{ textAlign: "right" }}>
-                  <p style={{ fontFamily: "var(--font-display)", fontSize: "26px", fontWeight: 500 }}>${grandTotal.toLocaleString()}</p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--color-gray-400)" }}>taxes not included</p>
+                <div style={{ borderTop: "1px solid var(--color-gray-200)", paddingTop: "10px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                  <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--color-black)", fontWeight: 600 }}>Total</span>
+                  <div style={{ textAlign: "right" }}>
+                    <p style={{ fontFamily: "var(--font-display)", fontSize: "26px", fontWeight: 500 }}>${grandTotal.toLocaleString()}</p>
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--color-gray-400)" }}>taxes not included</p>
+                  </div>
                 </div>
               </div>
 

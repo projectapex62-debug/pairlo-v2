@@ -1,52 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
-import { ArrowRight, MapPin, Calendar, ChevronDown, Star, ChevronUp, Shuffle, Trophy, Calculator, HelpCircle } from "lucide-react";
+import { ArrowRight, MapPin, Calendar, ChevronDown, Star, ChevronUp, Trophy, Calculator, HelpCircle } from "lucide-react";
 import { featuredPairs, destinations, stats, howItWorks, testimonials, allPairs } from "../lib/mock-data";
 import { PairCard } from "../components/pair-card";
-import { PairModal } from "../components/pair-modal";
 
-// ── SAVINGS STRIP ──────────────────────────────────────────────────────────
-function SavingsStrip() {
-  const ref = useRef<HTMLSpanElement>(null);
-  const triggered = useRef(false);
-  const TARGET = 2400000;
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !triggered.current) {
-        triggered.current = true;
-        const duration = 1800;
-        const start = performance.now();
-        const tick = (now: number) => {
-          const p = Math.min((now - start) / duration, 1);
-          const eased = 1 - Math.pow(1 - p, 3);
-          const val = Math.floor(eased * TARGET);
-          el.textContent = "$" + (val / 1000000).toFixed(1) + "M+";
-          if (p < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-      }
-    }, { threshold: 0.5 });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div style={{ background: "var(--color-mocha-pale)", borderBottom: "1px solid var(--color-gray-200)", padding: "18px 24px" }}>
-      <div style={{ maxWidth: "900px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "8px 20px", textAlign: "center" }}>
-        <span style={{ fontFamily: "var(--font-display)", fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: 500, color: "var(--color-black)" }}>
-          🎉 Pairlo travelers have saved{" "}
-          <span ref={ref} style={{ color: "var(--color-mocha)" }}>$0.0M+</span>
-        </span>
-        <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--color-gray-500)" }}>
-          vs. booking stays & cars separately
-        </span>
-      </div>
-    </div>
-  );
-}
 
 // ── PAIR OF THE WEEK ───────────────────────────────────────────────────────
 function PairOfTheWeek() {
@@ -212,7 +170,7 @@ export default function HomePage() {
   const [checkout, setCheckout] = useState("");
   const [, navigate] = useLocation();
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [surprisePair, setSurprisePair] = useState<typeof allPairs[0] | null>(null);
+
 
   useEffect(() => {
     const onScroll = () => setShowScrollTop(window.scrollY > 600);
@@ -239,8 +197,8 @@ export default function HomePage() {
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
         />
         {/* Overlay — richer cinematic gradient */}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(165deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.15) 45%, rgba(10,10,10,0.65) 100%)" }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.5) 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(165deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.15) 45%, rgba(10,10,10,0.65) 100%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.5) 100%)", pointerEvents: "none" }} />
 
         {/* Hero content */}
         <div
@@ -275,9 +233,7 @@ export default function HomePage() {
             <em style={{ fontStyle: "italic", color: "#E8C99A" }}>Two Keys.</em><br />
             Zero Hassle.
           </h1>
-          <p className="fade-up d300" style={{ color: "rgba(255,255,255,0.72)", fontFamily: "var(--font-body)", fontSize: "clamp(14px,1.5vw,18px)", marginTop: "28px", maxWidth: "520px", lineHeight: 1.75, textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
-            Every great trip starts with the right place to stay and the right car to explore it. We find both.
-          </p>
+
 
           {/* Catchphrase */}
           <div className="fade-up d350" style={{ marginTop: "28px", display: "flex", alignItems: "center", gap: "12px" }}>
@@ -290,9 +246,7 @@ export default function HomePage() {
               color: "rgba(255,255,255,0.85)",
               letterSpacing: "0.01em",
             }}>
-              Don't book twice —{" "}
-              <span style={{ color: "var(--color-mocha-pale)", fontWeight: 500 }}>Pairlo</span>
-              {" "}it.
+              Don't book twice — Pairlo it.
             </p>
             <div style={{ height: "1px", width: "40px", background: "var(--color-mocha)" }} />
           </div>
@@ -369,19 +323,7 @@ export default function HomePage() {
             </button>
           </div>
 
-          {/* Surprise Me */}
-          <button
-            className="fade-up d450"
-            onClick={() => {
-              const r = allPairs[Math.floor(Math.random() * allPairs.length)];
-              setSurprisePair(r);
-            }}
-            style={{ marginTop: "16px", display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255,255,255,0.1)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "20px", padding: "9px 20px", color: "rgba(255,255,255,0.8)", fontFamily: "var(--font-body)", fontSize: "13px", cursor: "pointer", transition: "all 0.2s", letterSpacing: "0.04em" }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.18)"; (e.currentTarget as HTMLElement).style.color = "white"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.1)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.8)"; }}
-          >
-            <Shuffle size={13} /> Surprise Me
-          </button>
+
         </div>
 
         {/* Scroll hint */}
@@ -391,46 +333,50 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Surprise Me Modal */}
-      {surprisePair && <PairModal pair={surprisePair} onClose={() => setSurprisePair(null)} />}
+
 
       {/* ── TRUST BAR ── */}
-      <div style={{ background: "white", borderBottom: "1px solid var(--color-gray-200)", padding: "18px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "0 40px", rowGap: "12px" }}>
-          {/* As seen in label */}
+      <div style={{ background: "white", borderBottom: "1px solid var(--color-gray-200)", padding: "16px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "12px 32px" }}>
+          {/* As seen in */}
           <span style={{ fontFamily: "var(--font-body)", fontSize: "9px", letterSpacing: "0.2em", color: "var(--color-gray-400)", textTransform: "uppercase", flexShrink: 0 }}>As seen in</span>
 
-          {/* Divider */}
-          <div style={{ width: "1px", height: "20px", background: "var(--color-gray-200)", flexShrink: 0 }} />
+          <div style={{ width: "1px", height: "18px", background: "var(--color-gray-200)", flexShrink: 0 }} />
 
-          {/* Publications */}
-          {["Forbes Travel", "CNN Travel", "Condé Nast", "Travel + Leisure", "The Points Guy"].map((pub, i, arr) => (
-            <span key={pub} style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontStyle: "italic", color: "var(--color-gray-500)", letterSpacing: "0.02em", whiteSpace: "nowrap" as const, display: "inline-flex", alignItems: "center", gap: "40px" }}>
-              {pub}
-              {i < arr.length - 1 && <span style={{ display: "inline-block", width: "3px", height: "3px", borderRadius: "50%", background: "var(--color-gray-300)", marginLeft: "0" }} />}
-            </span>
-          ))}
+          {/* Publications — dots rendered between, not inside */}
+          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "0", rowGap: "8px" }}>
+            {["Forbes Travel", "CNN Travel", "Condé Nast", "Travel + Leisure", "The Points Guy"].map((pub, i, arr) => (
+              <span key={pub} style={{ display: "inline-flex", alignItems: "center" }}>
+                <span style={{ fontFamily: "var(--font-display)", fontSize: "14px", fontStyle: "italic", color: "var(--color-gray-500)", letterSpacing: "0.02em", whiteSpace: "nowrap" as const, padding: "0 16px" }}>
+                  {pub}
+                </span>
+                {i < arr.length - 1 && (
+                  <span style={{ display: "inline-block", width: "3px", height: "3px", borderRadius: "50%", background: "var(--color-gray-300)", flexShrink: 0 }} />
+                )}
+              </span>
+            ))}
+          </div>
 
-          {/* Divider */}
-          <div style={{ width: "1px", height: "20px", background: "var(--color-gray-200)", flexShrink: 0 }} />
+          <div style={{ width: "1px", height: "18px", background: "var(--color-gray-200)", flexShrink: 0 }} />
 
-          {/* Stats */}
-          <div style={{ display: "flex", alignItems: "center", gap: "24px", flexShrink: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          {/* Rating + Trips booked */}
+          <div style={{ display: "flex", alignItems: "center", gap: "20px", flexShrink: 0, flexWrap: "wrap", justifyContent: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
               {[1,2,3,4,5].map(s => <Star key={s} size={11} fill={s <= 4 ? "#f59e0b" : "none"} color="#f59e0b" strokeWidth={s === 5 ? 1.5 : 0} />)}
               <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", fontWeight: 700, color: "var(--color-black)", marginLeft: "3px" }}>4.9</span>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--color-gray-400)" }}>/ 5</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--color-gray-400)" }}>&nbsp;/ 5</span>
             </div>
             <span style={{ width: "1px", height: "14px", background: "var(--color-gray-200)", display: "inline-block" }} />
             <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-gray-500)" }}>
               <strong style={{ color: "var(--color-black)", fontWeight: 700 }}>50,000+</strong> trips booked
             </span>
+            <span style={{ width: "1px", height: "14px", background: "var(--color-gray-200)", display: "inline-block" }} />
+            <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-gray-500)" }}>
+              <strong style={{ color: "var(--color-mocha)", fontWeight: 700 }}>$2.4M+</strong> saved vs. booking separately
+            </span>
           </div>
         </div>
       </div>
-
-      {/* ── SAVINGS COUNTER STRIP ── */}
-      <SavingsStrip />
 
       {/* ── FEATURED PAIRS ── */}
       <section style={{ background: "var(--color-white)", padding: "96px 24px" }}>
@@ -497,9 +443,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── STATS STRIP ── */}
-      <StatsStrip />
-
       {/* ── HOW IT WORKS ── */}
       <section style={{ background: "var(--color-cream)", padding: "96px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
@@ -526,9 +469,12 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── STATS STRIP ── */}
+      <StatsStrip />
+
       {/* ── FULL BLEED IMAGE ── */}
       <section style={{ position: "relative", height: "420px", overflow: "hidden" }}>
-        <img src="/car-rover.jpg" alt="Road trip" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center center" }} />
+        <img src="/car-rover.png" alt="Road trip" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center center" }} />
         <div style={{ position: "absolute", inset: 0, background: "rgba(27,46,31,0.5)" }} />
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 24px" }}>
           <div>
@@ -582,21 +528,7 @@ export default function HomePage() {
               </div>
             </Link>
           ))}
-          {/* Surprise Me — opens modal directly instead of navigating */}
-          <div
-            onClick={() => { const r = allPairs[Math.floor(Math.random() * allPairs.length)]; setSurprisePair(r); }}
-            style={{ display: "flex", alignItems: "center", gap: "14px", background: "white", border: "1px solid var(--color-gray-200)", borderRadius: "4px", padding: "16px 24px", cursor: "pointer", transition: "all 0.2s", minWidth: "240px" }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-mocha)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 16px rgba(138,158,123,0.12)"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-gray-200)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
-          >
-            <div style={{ width: "38px", height: "38px", borderRadius: "50%", background: "var(--color-mocha-pale)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "var(--color-mocha)" }}>
-              <Shuffle size={16} />
-            </div>
-            <div>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", fontWeight: 600, color: "var(--color-black)" }}>Surprise Me</p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "var(--color-gray-400)" }}>Random pair, curated for you</p>
-            </div>
-          </div>
+
         </div>
       </section>
 
@@ -744,30 +676,34 @@ export default function HomePage() {
 
       {/* ── SCROLL TO TOP ── */}
       {showScrollTop && (
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          style={{
-            position: "fixed",
-            bottom: "32px",
-            right: "32px",
-            width: "44px",
-            height: "44px",
-            borderRadius: "2px",
-            background: "var(--color-mocha)",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.25)",
-            zIndex: 200,
-            transition: "background 0.2s, opacity 0.3s",
-          }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--color-mocha-light)")}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--color-mocha)")}
-        >
-          <ChevronUp size={18} color="white" />
-        </button>
+        <>
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="scroll-top-btn"
+            style={{
+              position: "fixed",
+              bottom: "32px",
+              right: "32px",
+              width: "44px",
+              height: "44px",
+              borderRadius: "2px",
+              background: "var(--color-mocha)",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.25)",
+              zIndex: 200,
+              transition: "background 0.2s, opacity 0.3s",
+            }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--color-mocha-light)")}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--color-mocha)")}
+          >
+            <ChevronUp size={18} color="white" />
+          </button>
+          <style>{`@media (max-width: 768px) { .scroll-top-btn { bottom: 88px !important; } }`}</style>
+        </>
       )}
     </div>
   );

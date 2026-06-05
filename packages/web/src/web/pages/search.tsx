@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import {
-  SlidersHorizontal, MapPin, X, LayoutGrid, Map, SearchX, Shuffle,
+  SlidersHorizontal, MapPin, X, LayoutGrid, Map, SearchX,
   Star, Car, TrendingUp, Zap, Filter, ChevronDown, ChevronUp,
 } from "lucide-react";
 import { allPairs, mapPins } from "../lib/mock-data";
 import { PairCard } from "../components/pair-card";
-import { PairModal } from "../components/pair-modal";
 import { CompareDrawer } from "../components/compare-drawer";
 
 const DESTINATIONS = ["All", "Miami", "Aspen", "New York", "Los Angeles", "Nashville"];
@@ -292,7 +291,7 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
   const [activePinId, setActivePinId] = useState<string | null>(null);
-  const [surprisePair, setSurprisePair] = useState<typeof allPairs[0] | null>(null);
+
   const [vibeFilter, setVibeFilter] = useState<string | null>(null);
   const [minRating, setMinRating] = useState(0);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -553,7 +552,7 @@ export default function SearchPage() {
 
         {/* Trending pairs (only when showing all, no query) */}
         {!loading && destination === "All" && !query && (
-          <RecentlyViewed onSelect={(pair) => setSurprisePair(pair)} />
+          <RecentlyViewed onSelect={() => {}} />
         )}
 
         {/* Results bar */}
@@ -595,16 +594,6 @@ export default function SearchPage() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            {/* Surprise Me */}
-            <button
-              onClick={() => { const r = allPairs[Math.floor(Math.random() * allPairs.length)]; setSurprisePair(r); }}
-              style={{ display: "flex", alignItems: "center", gap: "6px", background: "var(--color-cream)", border: "1px solid var(--color-gray-200)", borderRadius: "2px", padding: "8px 14px", fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-gray-600)", cursor: "pointer", transition: "all 0.2s", fontWeight: 500 }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-mocha)"; (e.currentTarget as HTMLElement).style.color = "var(--color-mocha)"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-gray-200)"; (e.currentTarget as HTMLElement).style.color = "var(--color-gray-600)"; }}
-            >
-              <Shuffle size={12} /> Surprise Me
-            </button>
-
             {/* View toggle */}
             <div style={{ display: "flex", gap: "4px" }}>
               <button style={viewBtnStyle(viewMode === "grid")} onClick={() => setViewMode("grid")}>
@@ -711,8 +700,7 @@ export default function SearchPage() {
         )}
       </div>
 
-      {/* Surprise Me modal */}
-      {surprisePair && <PairModal pair={surprisePair} onClose={() => setSurprisePair(null)} />}
+
     </div>
   );
 }

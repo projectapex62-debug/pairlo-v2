@@ -28,7 +28,7 @@ const POSTS = [
     category: "Tips",
     title: "How to Choose the Right Car for Your Stay",
     subtitle: "Not all rentals are created equal. Here's the decision tree.",
-    image: "/car-rover.jpg",
+    image: "/car-rover.png",
     readTime: "4 min read",
     date: "April 2026",
     featured: false,
@@ -312,7 +312,7 @@ export default function BlogPage() {
       {/* Grid */}
       <div style={{ maxWidth: "1200px", margin: "32px auto 0", padding: "0 24px 96px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "28px" }}>
-          {filtered.filter((p) => !p.featured || activeCategory !== "All").map((post) => (
+          {filtered.filter((p) => activeCategory === "All" ? !p.featured : true).map((post) => (
             <div
               key={post.id}
               onClick={() => setActivePost(post)}

@@ -277,13 +277,7 @@ export default function TripPage() {
   });
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--color-cream)" }}>
-
-      {/* Header */}
-      <div style={{ background: "var(--color-black)", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Link to="/"><span style={{ fontFamily: "var(--font-display)", fontSize: "22px", color: "white", cursor: "pointer", letterSpacing: "-0.01em" }}>Pairlo</span></Link>
-        <Link to="/search"><span style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "rgba(255,255,255,0.5)", cursor: "pointer", letterSpacing: "0.08em" }}>FIND YOUR OWN PAIR →</span></Link>
-      </div>
+    <div style={{ minHeight: "100vh", background: "var(--color-cream)", paddingTop: "72px" }}>
 
       {/* Hero */}
       <div style={{ position: "relative", height: "340px", overflow: "hidden" }}>
@@ -308,7 +302,7 @@ export default function TripPage() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "32px", alignItems: "start" }} className="trip-grid">
 
           {/* ── Left column ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "28px" }} className="trip-left-col">
 
             {/* 1. Vibe Match */}
             <div style={{ background: "white", borderRadius: "6px", border: "1px solid var(--color-gray-200)", padding: "20px 24px" }}>
@@ -486,19 +480,13 @@ export default function TripPage() {
           </div>
 
           {/* ── Right column (sticky) ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px", position: "sticky", top: "24px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", position: "sticky", top: "24px" }} className="trip-right-col">
 
             {/* Price summary */}
             <div style={{ background: "white", borderRadius: "6px", border: "1px solid var(--color-gray-200)", overflow: "hidden" }}>
               <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--color-gray-100)" }}>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-gray-400)", marginBottom: "6px" }}>Total for {nights} nights</p>
                 <p style={{ fontFamily: "var(--font-display)", fontSize: "32px", fontWeight: 500 }}>${pairTotal.toLocaleString()}</p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-gray-400)", textDecoration: "line-through", marginTop: "2px" }}>${pair.separatePrice} if booked separately</p>
-                {savings > 0 && (
-                  <div style={{ marginTop: "8px", background: "#e8f5e9", borderRadius: "4px", padding: "6px 10px", display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                    <span style={{ fontFamily: "var(--font-body)", fontSize: "12px", fontWeight: 600, color: "#2d6a4f" }}>You save ${savings}</span>
-                  </div>
-                )}
+
               </div>
               <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--color-gray-100)" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-gray-400)", marginBottom: "8px" }}>Nights</p>
@@ -518,16 +506,7 @@ export default function TripPage() {
               </div>
             </div>
 
-            {/* Pair Score */}
-            <div style={{ background: "white", borderRadius: "6px", border: "1px solid var(--color-gray-200)", padding: "20px 24px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                <PairScoreBadge stayPrice={pair.stay.price} carPrice={pair.car.price} separatePrice={pair.separatePrice} totalNights={nights} stayTags={pair.stay.tags} carType={pair.car.type} stayRating={pair.stay.rating} badge={pair.badge} size="lg" />
-                <div>
-                  <p style={{ fontFamily: "var(--font-display)", fontSize: "18px" }}>{getScoreLabel(score.overall)}</p>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--color-gray-400)", marginTop: "3px" }}>Pairlo match score</p>
-                </div>
-              </div>
-            </div>
+
 
             {/* Share */}
             <div style={{ background: "white", borderRadius: "6px", border: "1px solid var(--color-gray-200)", padding: "20px 24px" }}>
@@ -553,6 +532,7 @@ export default function TripPage() {
       <style>{`
         @media (max-width: 768px) {
           .trip-grid { grid-template-columns: 1fr !important; }
+          .trip-right-col { order: -1; }
         }
       `}</style>
     </div>
