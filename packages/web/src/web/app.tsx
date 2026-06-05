@@ -1,7 +1,7 @@
 import { Route, Switch, useLocation } from "wouter";
 import { useEffect, useRef, useState } from "react";
 import { Provider } from "./components/provider";
-import { AgentFeedback, RunableBadge } from "@runablehq/website-runtime";
+import { AgentFeedback } from "@runablehq/website-runtime";
 import { Nav } from "./components/nav";
 import { Footer } from "./components/footer";
 import { CompareDrawer } from "./components/compare-drawer";
@@ -81,7 +81,7 @@ function App() {
       <CompareDrawer />
       <LiveActivityToast />
       {import.meta.env.DEV && <AgentFeedback />}
-      {<RunableBadge />}
+
     </Provider>
   );
 }
