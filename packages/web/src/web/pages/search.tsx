@@ -403,7 +403,7 @@ export default function SearchPage() {
               {query && <X size={14} color="rgba(255,255,255,0.4)" style={{ cursor: "pointer" }} onClick={() => setQuery("")} />}
             </div>
             <button
-              style={{ display: "flex", alignItems: "center", gap: "8px", padding: "14px 20px", borderLeft: "1px solid rgba(255,255,255,0.12)", cursor: "pointer", background: "transparent", border: "none", borderLeft: "1px solid rgba(255,255,255,0.12)" }}
+              style={{ display: "flex", alignItems: "center", gap: "8px", padding: "14px 20px", cursor: "pointer", background: "transparent", border: "none", borderLeft: "1px solid rgba(255,255,255,0.12)" }}
               onClick={() => setShowFilters(!showFilters)}
             >
               <SlidersHorizontal size={16} color="var(--color-mocha-light)" />
