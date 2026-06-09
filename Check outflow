@@ -1,0 +1,260 @@
+// ============================================================
+// PAIRLO CHECKOUT FLOW
+// Option B — One checkout inside Pairlo, no click-off
+// Books stay (Expedia) + car (Booking.com) simultaneously
+// ============================================================
+
+const stripe   = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { Pool } = require('pg');
+const { bookStay, bookCar } = require('./03-api-integrations');
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+// ── Commission Rates ─────────────────────────────────────────
+
+const COMMISSION = {
+  stay: 0.06,  // 6% via Expedia EPS Rapid
+  car:  0.06,  // 6% via Booking.com in-API (Stage 1)
+  // Stage 2: car bumps to 0.18 when direct suppliers go live
+};
+
+// ── Step 1: Create Payment Intent ───────────────────────────
+// Called when user clicks "Book This Pair"
+
+async function createPaymentIntent({ pairId, userId, guest }) {
+  const client = await pool.connect();
+  try {
+    // Get the pair details
+    const pairResult = await client.query(
+      `SELECT p.*, 
+              s.expedia_id, s.name as stay_name, s.total_price as stay_price,
+              c.booking_id, c.name as car_name, c.total_price as car_price,
+              c.pickup_date, c.return_date
+       FROM pairs p
+       JOIN stays s ON s.id = p.stay_id
+       JOIN cars  c ON c.id = p.car_id
+       WHERE p.id = $1`,
+      [pairId]
+    );
+
+    if (!pairResult.rows.length) throw new Error('Pair not found');
+    const pair = pairResult.rows[0];
+
+    // Calculate commissions
+    const stayCommission = Math.round(pair.stay_price * COMMISSION.stay * 100) / 100;
+    const carCommission  = Math.round(pair.car_price  * COMMISSION.car  * 100) / 100;
+    const totalAmount    = pair.stay_price + pair.car_price;
+
+    // Create Stripe Payment Intent
+    // NOTE: In production, Pairlo collects payment then pays out commissions
+    // The traveler pays the full bundle price through Pairlo
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount:   Math.round(totalAmount * 100), // Stripe uses cents
+      currency: 'usd',
+      metadata: {
+        pairId,
+        userId,
+        stayCommission: stayCommission.toString(),
+        carCommission:  carCommission.toString(),
+        pairloEarns:    (stayCommission + carCommission).toString(),
+      },
+    });
+
+    // Save pending booking to database
+    const bookingResult = await client.query(
+      `INSERT INTO bookings 
+       (user_id, pair_id, stay_commission, car_commission, total_commission, status, stripe_payment_id)
+       VALUES ($1, $2, $3, $4, $5, 'pending', $6)
+       RETURNING id`,
+      [userId, pairId, stayCommission, carCommission, stayCommission + carCommission, paymentIntent.id]
+    );
+
+    return {
+      clientSecret:  paymentIntent.client_secret,
+      bookingId:     bookingResult.rows[0].id,
+      totalAmount,
+      stayCommission,
+      carCommission,
+      pairloEarns:   stayCommission + carCommission,
+      pair: {
+        stayName:  pair.stay_name,
+        carName:   pair.car_name,
+        stayPrice: pair.stay_price,
+        carPrice:  pair.car_price,
+        pairScore: pair.pair_score,
+      },
+    };
+  } finally {
+    client.release();
+  }
+}
+
+// ── Step 2: Confirm Booking ──────────────────────────────────
+// Called after Stripe payment succeeds
+
+async function confirmBooking({ bookingId, paymentIntentId, guest, payment }) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Verify payment succeeded with Stripe
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    if (paymentIntent.status !== 'succeeded') {
+      throw new Error('Payment not confirmed');
+    }
+
+    // Get booking and pair details
+    const bookingResult = await client.query(
+      `SELECT b.*, 
+              s.expedia_id, s.total_price as stay_price,
+              c.booking_id as car_booking_id, c.total_price as car_price,
+              c.pickup_lat, c.pickup_lng,
+              sr.check_in, sr.check_out
+       FROM bookings b
+       JOIN pairs  p  ON p.id = b.pair_id
+       JOIN stays  s  ON s.id = p.stay_id
+       JOIN cars   c  ON c.id = p.car_id
+       JOIN searches sr ON sr.id = p.search_id
+       WHERE b.id = $1`,
+      [bookingId]
+    );
+
+    if (!bookingResult.rows.length) throw new Error('Booking not found');
+    const booking = bookingResult.rows[0];
+
+    // Book stay and car simultaneously (Promise.all = same time)
+    const [stayConfirmation, carConfirmation] = await Promise.all([
+      bookStay({
+        propertyId: booking.expedia_id,
+        checkIn:    booking.check_in,
+        checkOut:   booking.check_out,
+        guest,
+        payment,
+      }),
+      bookCar({
+        carId:       booking.car_booking_id,
+        pickupDate:  booking.check_in,
+        returnDate:  booking.check_out,
+        guest,
+        payment,
+      }),
+    ]);
+
+    // Update booking with confirmation numbers
+    await client.query(
+      `UPDATE bookings 
+       SET stay_confirmation = $1, 
+           car_confirmation  = $2, 
+           status            = 'confirmed',
+           updated_at        = NOW()
+       WHERE id = $3`,
+      [stayConfirmation.confirmationNumber, carConfirmation.confirmationNumber, bookingId]
+    );
+
+    await client.query('COMMIT');
+
+    // Return confirmation to user
+    return {
+      bookingId,
+      status:  'confirmed',
+      message: 'Your stay and car are both confirmed!',
+      stay: {
+        confirmation: stayConfirmation.confirmationNumber,
+        checkIn:      booking.check_in,
+        checkOut:     booking.check_out,
+      },
+      car: {
+        confirmation: carConfirmation.confirmationNumber,
+        pickupDate:   booking.check_in,
+        returnDate:   booking.check_out,
+      },
+      pairloEarns: booking.total_commission,
+    };
+  } catch (err) {
+    await client.query('ROLLBACK');
+
+    // Update booking status to failed
+    await pool.query(
+      `UPDATE bookings SET status = 'failed', updated_at = NOW() WHERE id = $1`,
+      [bookingId]
+    );
+
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+// ── Step 3: Send Confirmation Email ─────────────────────────
+
+async function sendConfirmationEmail({ booking, guest }) {
+  // Integrate with SendGrid or Resend
+  // Template includes:
+  // - Pairlo branding (Mocha & Olive)
+  // - Stay confirmation number + check-in details
+  // - Car confirmation number + pickup details
+  // - Shareable trip link: pairlo.com/trip/{bookingId}
+  // - Support contact: support@pairlo.com
+
+  console.log(`Confirmation email sent to ${guest.email} for booking ${booking.bookingId}`);
+  // TODO: Implement with SendGrid — sendgrid.com
+}
+
+// ── API Routes (Express) ─────────────────────────────────────
+
+const express = require('express');
+const router  = express.Router();
+
+// POST /api/checkout/intent
+router.post('/intent', async (req, res) => {
+  try {
+    const { pairId, userId, guest } = req.body;
+    if (!pairId || !userId) return res.status(400).json({ error: 'Missing required fields' });
+
+    const result = await createPaymentIntent({ pairId, userId, guest });
+    res.json(result);
+  } catch (err) {
+    console.error('Payment intent error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/checkout/confirm
+router.post('/confirm', async (req, res) => {
+  try {
+    const { bookingId, paymentIntentId, guest, payment } = req.body;
+    if (!bookingId || !paymentIntentId) return res.status(400).json({ error: 'Missing required fields' });
+
+    const result = await confirmBooking({ bookingId, paymentIntentId, guest, payment });
+    await sendConfirmationEmail({ booking: result, guest });
+    res.json(result);
+  } catch (err) {
+    console.error('Booking confirmation error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/bookings/:id
+router.get('/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT b.*, p.pair_score,
+              s.name as stay_name, s.total_price as stay_price,
+              c.name as car_name, c.total_price as car_price
+       FROM bookings b
+       JOIN pairs p ON p.id = b.pair_id
+       JOIN stays s ON s.id = p.stay_id
+       JOIN cars  c ON c.id = p.car_id
+       WHERE b.id = $1`,
+      [req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Booking not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+module.exports = router;
+module.exports.createPaymentIntent = createPaymentIntent;
+module.exports.confirmBooking      = confirmBooking;
