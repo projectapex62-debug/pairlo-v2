@@ -1,0 +1,235 @@
+// ============================================================
+// PAIRLO MATCHING ENGINE
+// The core algorithm that scores stay + car combinations
+// This is Pairlo's most valuable proprietary asset
+// ============================================================
+
+const { Pool } = require('pg');
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+// ── Constants ──────────────────────────────────────────────
+
+const WEIGHTS = {
+  proximity: 0.35,   // How close is car pickup to the stay?
+  dateAlign: 0.30,   // Do check-in and car pickup dates sync perfectly?
+  priceValue: 0.20,  // Is the combined price reasonable for the market?
+  styleMatch: 0.15,  // Does the property tier match the car tier?
+};
+
+const STYLE_TIERS = {
+  stay: {
+    budget:   { max: 1000,  tier: 1 },
+    standard: { max: 2500,  tier: 2 },
+    premium:  { max: 5000,  tier: 3 },
+    luxury:   { max: Infinity, tier: 4 },
+  },
+  car: {
+    economy:  { max: 150,   tier: 1 },
+    standard: { max: 300,   tier: 2 },
+    premium:  { max: 600,   tier: 3 },
+    luxury:   { max: Infinity, tier: 4 },
+  },
+};
+
+// ── Haversine Distance (km between two coordinates) ────────
+
+function getDistanceKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// ── Individual Scoring Functions ────────────────────────────
+
+// Proximity score: closer pickup = higher score
+function scoreProximity(stay, car) {
+  const distKm = getDistanceKm(
+    stay.lat, stay.lng,
+    car.pickup_lat, car.pickup_lng
+  );
+  if (distKm <= 1)  return 10;
+  if (distKm <= 3)  return 8.5;
+  if (distKm <= 7)  return 7;
+  if (distKm <= 15) return 5;
+  if (distKm <= 30) return 3;
+  return 1;
+}
+
+// Date alignment score: seamless check-in/pickup = higher score
+function scoreDateAlignment(search, car) {
+  // Perfect: car pickup same day as check-in
+  // Good: car pickup day before check-in
+  // Poor: more than 1 day gap
+  const checkIn = new Date(search.check_in);
+  const pickup = new Date(car.pickup_date || search.check_in);
+  const diffDays = Math.abs((pickup - checkIn) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 10;
+  if (diffDays === 1) return 7;
+  if (diffDays === 2) return 4;
+  return 2;
+}
+
+// Price value score: reasonable combined price for the market
+function scorePriceValue(stay, car) {
+  const total = stay.total_price + car.total_price;
+  const nights = stay.nights || 5;
+  const perNight = total / nights;
+
+  // Score based on value proposition
+  if (perNight < 200)  return 10;
+  if (perNight < 350)  return 8.5;
+  if (perNight < 500)  return 7;
+  if (perNight < 750)  return 5.5;
+  if (perNight < 1000) return 4;
+  return 3;
+}
+
+// Style match score: luxury stay deserves a premium car
+function scoreStyleMatch(stay, car) {
+  const getStayTier = (price) => {
+    if (price <= 1000) return 1;
+    if (price <= 2500) return 2;
+    if (price <= 5000) return 3;
+    return 4;
+  };
+  const getCarTier = (price) => {
+    if (price <= 150) return 1;
+    if (price <= 300) return 2;
+    if (price <= 600) return 3;
+    return 4;
+  };
+
+  const stayTier = getStayTier(stay.total_price);
+  const carTier  = getCarTier(car.total_price);
+  const diff = Math.abs(stayTier - carTier);
+
+  if (diff === 0) return 10;  // Perfect match
+  if (diff === 1) return 7;   // One tier apart
+  if (diff === 2) return 4;   // Two tiers apart
+  return 1;                   // Mismatch
+}
+
+// ── Master Pair Score ────────────────────────────────────────
+
+function calculatePairScore(stay, car, search) {
+  const proximity  = scoreProximity(stay, car);
+  const dateAlign  = scoreDateAlignment(search, car);
+  const priceValue = scorePriceValue(stay, car);
+  const styleMatch = scoreStyleMatch(stay, car);
+
+  const weighted =
+    proximity  * WEIGHTS.proximity  +
+    dateAlign  * WEIGHTS.dateAlign  +
+    priceValue * WEIGHTS.priceValue +
+    styleMatch * WEIGHTS.styleMatch;
+
+  const finalScore = Math.round(weighted * 10) / 10;
+
+  return {
+    pairScore:      finalScore,
+    proximityScore: proximity,
+    dateScore:      dateAlign,
+    priceScore:     priceValue,
+    styleScore:     styleMatch,
+    distanceKm:     getDistanceKm(stay.lat, stay.lng, car.pickup_lat, car.pickup_lng),
+  };
+}
+
+// ── Main Matching Function ───────────────────────────────────
+
+async function generatePairs(stays, cars, search, limit = 20) {
+  const pairs = [];
+
+  for (const stay of stays) {
+    for (const car of cars) {
+      const scores = calculatePairScore(stay, car, search);
+
+      // Only surface quality pairs (score >= 5.0)
+      if (scores.pairScore >= 5.0) {
+        pairs.push({
+          stay,
+          car,
+          ...scores,
+          totalPrice: stay.total_price + car.total_price,
+          stayCommission:  Math.round(stay.total_price * 0.06),
+          carCommission:   Math.round(car.total_price  * 0.06),
+          totalCommission: Math.round((stay.total_price * 0.06) + (car.total_price * 0.06)),
+        });
+      }
+    }
+  }
+
+  // Sort by Pair Score descending
+  pairs.sort((a, b) => b.pairScore - a.pairScore);
+
+  return pairs.slice(0, limit);
+}
+
+// ── Fallback Strategy (no good pairs found) ─────────────────
+
+async function getFallbackPairs(stays, cars, search) {
+  // Relax minimum score to 3.0 and return top 5
+  const allPairs = [];
+  for (const stay of stays) {
+    for (const car of cars) {
+      const scores = calculatePairScore(stay, car, search);
+      allPairs.push({ stay, car, ...scores, totalPrice: stay.total_price + car.total_price });
+    }
+  }
+  allPairs.sort((a, b) => b.pairScore - a.pairScore);
+  return allPairs.slice(0, 5);
+}
+
+// ── Save Pairs to Database ───────────────────────────────────
+
+async function savePairs(pairs, searchId) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const savedPairs = [];
+    for (const pair of pairs) {
+      const result = await client.query(
+        `INSERT INTO pairs 
+         (search_id, stay_id, car_id, pair_score, proximity_score, date_score, price_score, style_score, total_price)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         RETURNING id`,
+        [
+          searchId,
+          pair.stay.id,
+          pair.car.id,
+          pair.pairScore,
+          pair.proximityScore,
+          pair.dateScore,
+          pair.priceScore,
+          pair.styleScore,
+          pair.totalPrice,
+        ]
+      );
+      savedPairs.push({ ...pair, id: result.rows[0].id });
+    }
+
+    await client.query('COMMIT');
+    return savedPairs;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+module.exports = {
+  calculatePairScore,
+  generatePairs,
+  getFallbackPairs,
+  savePairs,
+  getDistanceKm,
+};
