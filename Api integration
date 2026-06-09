@@ -1,0 +1,270 @@
+// ============================================================
+// PAIRLO API INTEGRATIONS
+// Expedia EPS Rapid (stays) + Booking.com Demand API (cars)
+// Option B architecture — everything inside Pairlo checkout
+// ============================================================
+
+const axios = require('axios');
+
+// ── Config ──────────────────────────────────────────────────
+
+const EXPEDIA_CONFIG = {
+  baseURL:  'https://test.ean.com/v3',  // Switch to prod URL at launch
+  key:      process.env.EXPEDIA_API_KEY,
+  secret:   process.env.EXPEDIA_API_SECRET,
+};
+
+const BOOKING_CONFIG = {
+  baseURL:  'https://distribution-xml.booking.com/3.0',
+  username: process.env.BOOKING_USERNAME,
+  password: process.env.BOOKING_PASSWORD,
+};
+
+// ── Expedia EPS Rapid — Stays ────────────────────────────────
+
+const expediaClient = axios.create({
+  baseURL: EXPEDIA_CONFIG.baseURL,
+  headers: {
+    'Authorization': `EPS apikey="${EXPEDIA_CONFIG.key}",secret="${EXPEDIA_CONFIG.secret}"`,
+    'Content-Type':  'application/json',
+    'Accept':        'application/json',
+  },
+});
+
+// Search available stays
+async function searchStays({ destination, checkIn, checkOut, guests, lat, lng }) {
+  try {
+    const response = await expediaClient.get('/properties/availability', {
+      params: {
+        checkin:           checkIn,
+        checkout:          checkOut,
+        occupancy:         `adults-${guests}`,
+        property_id:       undefined,
+        currency:          'USD',
+        language:          'en-US',
+        country_code:      'US',
+        sales_channel:     'website',
+        sales_environment: 'hotel_only',
+        sort_type:         'preferred',
+        include:           ['id', 'score', 'property_id'].join(','),
+        latitude:          lat,
+        longitude:         lng,
+        radius:            50,  // km
+        limit:             25,
+      },
+    });
+
+    return normalizeStays(response.data, checkIn, checkOut);
+  } catch (err) {
+    console.error('Expedia search error:', err.response?.data || err.message);
+    throw new Error('Failed to fetch stays from Expedia');
+  }
+}
+
+// Get full stay details for booking
+async function getStayDetails(propertyId, checkIn, checkOut, guests) {
+  try {
+    const response = await expediaClient.get(`/properties/${propertyId}/rooms`, {
+      params: {
+        checkin:      checkIn,
+        checkout:     checkOut,
+        occupancy:    `adults-${guests}`,
+        currency:     'USD',
+        language:     'en-US',
+        sales_channel: 'website',
+      },
+    });
+    return response.data;
+  } catch (err) {
+    console.error('Expedia details error:', err.response?.data || err.message);
+    throw new Error('Failed to fetch stay details');
+  }
+}
+
+// Book a stay — returns confirmation number
+async function bookStay({ propertyId, roomId, rateId, checkIn, checkOut, guest, payment }) {
+  try {
+    const response = await expediaClient.post('/itineraries', {
+      affiliate_reference_id: `pairlo-${Date.now()}`,
+      hold:                   false,
+      email:                  guest.email,
+      phone: {
+        country_code: '1',
+        number:       guest.phone,
+      },
+      rooms: [{
+        given_name:  guest.firstName,
+        family_name: guest.lastName,
+        smoking:     false,
+      }],
+      payments: [{
+        type:             'affiliate_collect',
+        billing_contact:  {
+          given_name:  guest.firstName,
+          family_name: guest.lastName,
+          email:       guest.email,
+          address: {
+            line_1:       payment.address,
+            city:         payment.city,
+            state_province_code: payment.state,
+            postal_code:  payment.zip,
+            country_code: 'US',
+          },
+        },
+      }],
+    });
+
+    return {
+      confirmationNumber: response.data.itinerary_id,
+      status:             'confirmed',
+      provider:           'expedia',
+    };
+  } catch (err) {
+    console.error('Expedia booking error:', err.response?.data || err.message);
+    throw new Error('Failed to complete stay booking');
+  }
+}
+
+// Normalize Expedia response to Pairlo format
+function normalizeStays(data, checkIn, checkOut) {
+  const nights = Math.ceil(
+    (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)
+  );
+
+  return (data.properties || []).map(p => ({
+    id:             p.property_id,
+    expedia_id:     p.property_id,
+    name:           p.name,
+    property_type:  p.type,
+    lat:            p.location?.coordinates?.latitude,
+    lng:            p.location?.coordinates?.longitude,
+    rating:         p.reviews?.rating,
+    price_per_night: p.rooms?.[0]?.rates?.[0]?.nightly_price || 0,
+    total_price:    (p.rooms?.[0]?.rates?.[0]?.nightly_price || 0) * nights,
+    nights,
+    images:         p.images?.slice(0, 5).map(i => i.links?.['350px']?.href),
+    amenities:      p.amenities?.slice(0, 10).map(a => a.name),
+    cancellation:   p.rooms?.[0]?.rates?.[0]?.cancel_policies?.[0]?.type,
+    raw_data:       p,
+  }));
+}
+
+// ── Booking.com Demand API — Cars ────────────────────────────
+
+const bookingClient = axios.create({
+  baseURL: BOOKING_CONFIG.baseURL,
+  auth: {
+    username: BOOKING_CONFIG.username,
+    password: BOOKING_CONFIG.password,
+  },
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept':       'application/json',
+  },
+});
+
+// Search available cars
+async function searchCars({ lat, lng, pickupDate, returnDate, destination }) {
+  try {
+    const response = await bookingClient.get('/json/cars', {
+      params: {
+        pick_up_latitude:    lat,
+        pick_up_longitude:   lng,
+        drop_off_latitude:   lat,
+        drop_off_longitude:  lng,
+        pick_up_date:        pickupDate,
+        drop_off_date:       returnDate,
+        driver_age:          30,
+        currency:            'USD',
+        language:            'en-us',
+        limit:               25,
+      },
+    });
+
+    return normalizeCars(response.data);
+  } catch (err) {
+    console.error('Booking.com cars error:', err.response?.data || err.message);
+    throw new Error('Failed to fetch cars from Booking.com');
+  }
+}
+
+// Book a car — returns confirmation
+async function bookCar({ carId, pickupDate, returnDate, guest, payment }) {
+  try {
+    const response = await bookingClient.post('/json/cars/book', {
+      car_id:       carId,
+      pick_up_date: pickupDate,
+      drop_off_date: returnDate,
+      driver: {
+        first_name: guest.firstName,
+        last_name:  guest.lastName,
+        email:      guest.email,
+        phone:      guest.phone,
+        age:        guest.age || 30,
+      },
+      payment: {
+        card_type:   payment.cardType,
+        card_number: payment.cardNumber,
+        expiry:      payment.expiry,
+        cvv:         payment.cvv,
+        name:        `${guest.firstName} ${guest.lastName}`,
+      },
+      affiliate_reference: `pairlo-car-${Date.now()}`,
+    });
+
+    return {
+      confirmationNumber: response.data.booking_reference,
+      status:             'confirmed',
+      provider:           'booking_com',
+      commission:         response.data.commission_amount,
+    };
+  } catch (err) {
+    console.error('Booking.com car booking error:', err.response?.data || err.message);
+    throw new Error('Failed to complete car booking');
+  }
+}
+
+// Normalize Booking.com response to Pairlo format
+function normalizeCars(data) {
+  return (data.vehicles || []).map(v => ({
+    id:             v.vehicle_id,
+    booking_id:     v.vehicle_id,
+    name:           `${v.make} ${v.model}`,
+    category:       v.category,
+    pickup_lat:     v.pick_up_location?.latitude,
+    pickup_lng:     v.pick_up_location?.longitude,
+    pickup_address: v.pick_up_location?.address,
+    total_price:    v.price?.total,
+    seats:          v.seats,
+    transmission:   v.transmission,
+    images:         [v.image_url],
+    raw_data:       v,
+  }));
+}
+
+// ── Geocoding (destination → lat/lng) ───────────────────────
+
+async function geocodeDestination(destination) {
+  try {
+    const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+      params: {
+        address: destination,
+        key:     process.env.GOOGLE_MAPS_KEY,
+      },
+    });
+    const loc = response.data.results?.[0]?.geometry?.location;
+    if (!loc) throw new Error('Location not found');
+    return { lat: loc.lat, lng: loc.lng };
+  } catch (err) {
+    throw new Error(`Could not geocode destination: ${destination}`);
+  }
+}
+
+module.exports = {
+  searchStays,
+  getStayDetails,
+  bookStay,
+  searchCars,
+  bookCar,
+  geocodeDestination,
+};
