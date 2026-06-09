@@ -1,0 +1,125 @@
+// ============================================================
+// PAIRLO MAIN SEARCH API
+// Ties together geocoding, API calls, and matching engine
+// GET /api/search?destination=Miami&checkIn=2026-10-15&checkOut=2026-10-20&guests=2
+// ============================================================
+
+const express  = require('express');
+const { Pool } = require('pg');
+const router   = express.Router();
+const pool     = new Pool({ connectionString: process.env.DATABASE_URL });
+
+const { searchStays, searchCars, geocodeDestination } = require('./03-api-integrations');
+const { generatePairs, getFallbackPairs, savePairs }  = require('./02-matching-engine');
+
+// GET /api/search
+router.get('/', async (req, res) => {
+  const { destination, checkIn, checkOut, guests = 1 } = req.query;
+
+  // Validate inputs
+  if (!destination || !checkIn || !checkOut) {
+    return res.status(400).json({ error: 'destination, checkIn, and checkOut are required' });
+  }
+
+  try {
+    // 1. Geocode the destination
+    const { lat, lng } = await geocodeDestination(destination);
+
+    // 2. Save the search
+    const searchResult = await pool.query(
+      `INSERT INTO searches (destination, check_in, check_out, guests, lat, lng)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [destination, checkIn, checkOut, guests, lat, lng]
+    );
+    const searchId = searchResult.rows[0].id;
+
+    // 3. Fetch stays and cars simultaneously
+    const [stays, cars] = await Promise.all([
+      searchStays({ destination, checkIn, checkOut, guests, lat, lng }),
+      searchCars({ lat, lng, pickupDate: checkIn, returnDate: checkOut, destination }),
+    ]);
+
+    // 4. Run matching engine
+    let pairs = await generatePairs(stays, cars, { check_in: checkIn, check_out: checkOut });
+
+    // 5. Fallback if no quality pairs found
+    if (pairs.length === 0) {
+      pairs = await getFallbackPairs(stays, cars, { check_in: checkIn, check_out: checkOut });
+    }
+
+    // 6. Save pairs to database (Pairlo's data moat)
+    const savedPairs = await savePairs(pairs, searchId);
+
+    // 7. Return results
+    res.json({
+      searchId,
+      destination,
+      checkIn,
+      checkOut,
+      guests,
+      totalPairs: savedPairs.length,
+      pairs: savedPairs.map(p => ({
+        id:         p.id,
+        pairScore:  p.pairScore,
+        totalPrice: p.totalPrice,
+        distanceKm: Math.round(p.distanceKm * 10) / 10,
+        stay: {
+          id:           p.stay.id,
+          name:         p.stay.name,
+          type:         p.stay.property_type,
+          pricePerNight: p.stay.price_per_night,
+          totalPrice:   p.stay.total_price,
+          rating:       p.stay.rating,
+          images:       p.stay.images,
+          amenities:    p.stay.amenities,
+          cancellation: p.stay.cancellation,
+        },
+        car: {
+          id:            p.car.id,
+          name:          p.car.name,
+          category:      p.car.category,
+          totalPrice:    p.car.total_price,
+          seats:         p.car.seats,
+          transmission:  p.car.transmission,
+          pickupAddress: p.car.pickup_address,
+          images:        p.car.images,
+        },
+        scores: {
+          pair:      p.pairScore,
+          proximity: p.proximityScore,
+          date:      p.dateScore,
+          price:     p.priceScore,
+          style:     p.styleScore,
+        },
+      })),
+    });
+  } catch (err) {
+    console.error('Search error:', err);
+    res.status(500).json({ error: 'Search failed. Please try again.' });
+  }
+});
+
+module.exports = router;
+
+// ============================================================
+// PAIRLO SERVER ENTRY POINT (index.js)
+// ============================================================
+
+/*
+const express    = require('express');
+const cors       = require('cors');
+const app        = express();
+
+app.use(cors());
+app.use(express.json());
+
+// Routes
+app.use('/api/search',   require('./05-search-api'));
+app.use('/api/checkout', require('./04-checkout-flow'));
+
+// Health check
+app.get('/api/health', (req, res) => res.json({ status: 'Pairlo API running' }));
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Pairlo API running on port ${PORT}`));
+*/
