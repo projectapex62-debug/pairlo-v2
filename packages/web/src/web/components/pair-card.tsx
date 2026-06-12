@@ -11,6 +11,15 @@ export interface PairCardData {
   separatePrice?: number;
   carMatchReason?: string;
   lastBooked?: string; // e.g. "2 hours ago"
+  /** Engine score from matching-engine.ts — when present, overrides computePairScore() in the badge */
+  engineScore?: {
+    pairScore:      number;
+    proximityScore: number;
+    dateScore:      number;
+    priceScore:     number;
+    styleScore:     number;
+    distanceKm:     number;
+  };
   stay: {
     name: string;
     location: string;
@@ -251,6 +260,7 @@ export function PairCard({ pair, featured = false, onCompareChange }: {
                 stayRating={pair.stay.rating}
                 badge={pair.badge}
                 size="sm"
+                engineScore={pair.engineScore}
               />
             </div>
 

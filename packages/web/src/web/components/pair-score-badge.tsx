@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { computePairScore, getScoreColor, getScoreLabel, PairScoreBreakdown } from "../lib/pair-score";
-import { MapPin, DollarSign, Sparkles, TrendingUp } from "lucide-react";
+import { MapPin, DollarSign, Sparkles, TrendingUp, Navigation } from "lucide-react";
+
+interface EngineScoreShape {
+  pairScore:      number;
+  proximityScore: number;
+  dateScore:      number;
+  priceScore:     number;
+  styleScore:     number;
+  distanceKm:     number;
+}
 
 interface PairScoreBadgeProps {
   stayPrice: number;
@@ -12,6 +21,8 @@ interface PairScoreBadgeProps {
   stayRating: number;
   badge?: string;
   size?: "sm" | "md" | "lg";
+  /** When present, engine score overrides the UI-computed score */
+  engineScore?: EngineScoreShape;
 }
 
 function ScoreBar({ value, color }: { value: number; color: string }) {
@@ -22,18 +33,26 @@ function ScoreBar({ value, color }: { value: number; color: string }) {
   );
 }
 
-export function PairScoreBadge({ stayPrice, carPrice, separatePrice, totalNights, stayTags, carType, stayRating, badge, size = "md" }: PairScoreBadgeProps) {
+export function PairScoreBadge({ stayPrice, carPrice, separatePrice, totalNights, stayTags, carType, stayRating, badge, size = "md", engineScore }: PairScoreBadgeProps) {
   const [showTooltip, setShowTooltip] = useState(false);
 
-  const scores = computePairScore({ stayPrice, carPrice, separatePrice, totalNights, stayTags, carType, stayRating, badge });
-  const color = getScoreColor(scores.overall);
-  const label = getScoreLabel(scores.overall);
+  // Use real engine score if available, fall back to UI-computed score
+  const uiScores = computePairScore({ stayPrice, carPrice, separatePrice, totalNights, stayTags, carType, stayRating, badge });
+  const displayScore = engineScore ? engineScore.pairScore : uiScores.overall;
+  const color = getScoreColor(displayScore);
+  const label = getScoreLabel(displayScore);
 
-  const dimensions = [
-    { key: "locationSync", label: "Location Sync", icon: <MapPin size={11} />, value: scores.locationSync },
-    { key: "styleHarmony", label: "Style Harmony", icon: <Sparkles size={11} />, value: scores.styleHarmony },
-    { key: "priceMatch", label: "Price Balance", icon: <DollarSign size={11} />, value: scores.priceMatch },
-    { key: "value", label: "Value Score", icon: <TrendingUp size={11} />, value: scores.value },
+  // Tooltip dimensions: engine score shows its 4 real dimensions, UI score shows UI dimensions
+  const dimensions = engineScore ? [
+    { key: "proximity",  label: "Proximity",     icon: <Navigation size={11} />, value: engineScore.proximityScore },
+    { key: "dateAlign",  label: "Date Alignment", icon: <TrendingUp size={11} />, value: engineScore.dateScore },
+    { key: "priceValue", label: "Price Value",    icon: <DollarSign size={11} />, value: engineScore.priceScore },
+    { key: "styleMatch", label: "Style Match",    icon: <Sparkles size={11} />,  value: engineScore.styleScore },
+  ] : [
+    { key: "locationSync", label: "Location Sync", icon: <MapPin size={11} />, value: uiScores.locationSync },
+    { key: "styleHarmony", label: "Style Harmony", icon: <Sparkles size={11} />, value: uiScores.styleHarmony },
+    { key: "priceMatch",   label: "Price Balance", icon: <DollarSign size={11} />, value: uiScores.priceMatch },
+    { key: "value",        label: "Value Score",   icon: <TrendingUp size={11} />, value: uiScores.value },
   ];
 
   const sizes = {
@@ -65,7 +84,7 @@ export function PairScoreBadge({ stayPrice, carPrice, separatePrice, totalNights
         }}
       >
         <span style={{ fontFamily: "var(--font-display)", fontSize: s.fontSize, fontWeight: 600, color, lineHeight: 1 }}>
-          {scores.overall}
+          {displayScore}
         </span>
         <span style={{ fontFamily: "var(--font-body)", fontSize: s.labelSize, color, letterSpacing: "0.04em", lineHeight: 1.2, marginTop: "2px" }}>
           SCORE
@@ -93,8 +112,17 @@ export function PairScoreBadge({ stayPrice, carPrice, separatePrice, totalNights
           {/* Header */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
             <div>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "rgba(0,0,0,0.45)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Pair Score</p>
-              <p style={{ fontFamily: "var(--font-display)", fontSize: "22px", color, fontWeight: 600, lineHeight: 1 }}>{scores.overall}<span style={{ fontSize: "13px", color: "rgba(0,0,0,0.35)" }}>/10</span></p>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", color: "rgba(0,0,0,0.45)", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                {engineScore ? "Engine Score" : "Pair Score"}
+              </p>
+              <p style={{ fontFamily: "var(--font-display)", fontSize: "22px", color, fontWeight: 600, lineHeight: 1 }}>
+                {displayScore}<span style={{ fontSize: "13px", color: "rgba(0,0,0,0.35)" }}>/10</span>
+              </p>
+              {engineScore && (
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "10px", color: "rgba(0,0,0,0.35)", marginTop: "2px" }}>
+                  {engineScore.distanceKm.toFixed(1)} km pickup distance
+                </p>
+              )}
             </div>
             <span style={{ background: `${color}15`, color, fontFamily: "var(--font-body)", fontSize: "11px", fontWeight: 600, padding: "4px 10px", borderRadius: "20px", letterSpacing: "0.04em" }}>
               {label}

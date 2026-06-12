@@ -7,6 +7,23 @@ import {
 import { allPairs, mapPins } from "../lib/mock-data";
 import { PairCard } from "../components/pair-card";
 import { CompareDrawer } from "../components/compare-drawer";
+import { getScoredAndSortedPairs } from "../../api/engine/mock-adapter";
+
+// Pre-score all pairs once using the matching engine (mock dates — representative trip)
+const MOCK_SEARCH = { check_in: "2026-10-15", check_out: "2026-10-20" };
+const scoredPairs = getScoredAndSortedPairs(allPairs, MOCK_SEARCH);
+
+// Helper: inject engineBreakdown into PairCard's engineScore prop
+function ScoredPairCard({ pair }: { pair: typeof scoredPairs[number] }) {
+  return (
+    <PairCard
+      pair={{
+        ...pair,
+        engineScore: pair.engineBreakdown ?? undefined,
+      }}
+    />
+  );
+}
 
 const DESTINATIONS = ["All", "Miami", "Aspen", "New York", "Los Angeles", "Nashville"];
 const SORT_OPTIONS = ["Recommended", "Price: Low to High", "Price: High to Low", "Top Rated"];
@@ -212,7 +229,7 @@ function PopularDestinations({ onSelect }: { onSelect: (d: string) => void }) {
 // ── RECENTLY VIEWED ───────────────────────────────────────────────────────
 function RecentlyViewed({ onSelect }: { onSelect: (pair: typeof allPairs[0]) => void }) {
   // Show last 3 pairs as "recently viewed"
-  const recents = allPairs.slice(3, 6);
+  const recents = scoredPairs.slice(3, 6);
   return (
     <div style={{ marginBottom: "48px" }}>
       <p style={{ fontFamily: "var(--font-body)", fontSize: "11px", letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--color-gray-400)", marginBottom: "16px" }}>
@@ -312,7 +329,7 @@ export default function SearchPage() {
     }
   }, []);
 
-  const filtered = allPairs
+  const filtered = scoredPairs
     .filter((p) => {
       const loc = p.stay?.location ?? "";
       const name = p.stay?.name ?? "";
@@ -346,7 +363,8 @@ export default function SearchPage() {
       if (sortBy === "Price: Low to High") return (a.stay?.price ?? 0) - (b.stay?.price ?? 0);
       if (sortBy === "Price: High to Low") return (b.stay?.price ?? 0) - (a.stay?.price ?? 0);
       if (sortBy === "Top Rated") return (b.stay?.rating ?? 0) - (a.stay?.rating ?? 0);
-      return 0;
+      // "Recommended" = matching engine score descending (already pre-sorted, but re-sort to be safe)
+      return (b.engineScore ?? 0) - (a.engineScore ?? 0);
     });
 
   const activeFilterCount = [
@@ -626,7 +644,7 @@ export default function SearchPage() {
                   Selected Pair
                 </p>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "28px", maxWidth: "680px" }}>
-                  {filtered.filter(p => p.id === activePinId).map(pair => <PairCard key={pair.id} pair={pair} />)}
+                  {filtered.filter(p => p.id === activePinId).map(pair => <ScoredPairCard key={pair.id} pair={pair} />)}
                 </div>
               </div>
             )}
@@ -638,7 +656,7 @@ export default function SearchPage() {
                 {filtered.map((pair) => (
                   <div key={pair.id} onClick={() => setActivePinId(pair.id === activePinId ? null : pair.id)}
                     style={{ cursor: "pointer", outline: pair.id === activePinId ? "2px solid var(--color-mocha)" : "2px solid transparent", borderRadius: "6px", transition: "outline 0.2s" }}>
-                    <PairCard pair={pair} />
+                    <ScoredPairCard pair={pair} />
                   </div>
                 ))}
               </div>
@@ -669,14 +687,14 @@ export default function SearchPage() {
                 You might like
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "28px" }}>
-                {allPairs.slice(0, 3).map((pair) => <PairCard key={pair.id} pair={pair} />)}
+                {scoredPairs.slice(0, 3).map((pair) => <ScoredPairCard key={pair.id} pair={pair} />)}
               </div>
             </div>
           </div>
         ) : (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "28px" }}>
-              {filtered.map((pair) => <PairCard key={pair.id} pair={pair} />)}
+              {filtered.map((pair) => <ScoredPairCard key={pair.id} pair={pair} />)}
             </div>
 
             {/* Bottom CTA after results */}
