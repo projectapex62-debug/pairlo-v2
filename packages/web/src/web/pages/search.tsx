@@ -13,6 +13,8 @@ import { getScoredAndSortedPairs } from "../../api/engine/mock-adapter";
 const MOCK_SEARCH = { check_in: "2026-10-15", check_out: "2026-10-20" };
 const scoredPairs = getScoredAndSortedPairs(allPairs, MOCK_SEARCH);
 
+type ApiPair = typeof scoredPairs[number];
+
 // Helper: inject engineBreakdown into PairCard's engineScore prop
 function ScoredPairCard({ pair }: { pair: typeof scoredPairs[number] }) {
   return (
@@ -313,6 +315,9 @@ export default function SearchPage() {
   const [minRating, setMinRating] = useState(0);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
+  const [apiPairs, setApiPairs] = useState<ApiPair[] | null>(null);
+  const [apiLoading, setApiLoading] = useState(false);
+
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 900);
     return () => clearTimeout(t);
@@ -329,7 +334,28 @@ export default function SearchPage() {
     }
   }, []);
 
-  const filtered = scoredPairs
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const dest    = params.get("destination") ?? params.get("q");
+    const checkIn  = params.get("checkIn");
+    const checkOut = params.get("checkOut");
+    const guests   = params.get("guests") ?? "2";
+    if (!dest || !checkIn || !checkOut) return;
+
+    setApiLoading(true);
+    fetch(`/api/search?destination=${encodeURIComponent(dest)}&checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}&guests=${guests}`)
+      .then(r => r.json())
+      .then((data: { pairs?: ApiPair[] }) => {
+        if (Array.isArray(data.pairs) && data.pairs.length > 0) {
+          setApiPairs(data.pairs);
+        }
+      })
+      .catch(() => { /* fall back to mock data */ })
+      .finally(() => setApiLoading(false));
+  }, []);
+
+  const basePairs = apiPairs ?? scoredPairs;
+  const filtered = basePairs
     .filter((p) => {
       const loc = p.stay?.location ?? "";
       const name = p.stay?.name ?? "";
@@ -631,7 +657,7 @@ export default function SearchPage() {
         </div>
 
         {/* ── CONTENT ── */}
-        {loading ? (
+        {(loading || apiLoading) ? (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "28px" }}>
             {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>

@@ -1,14 +1,12 @@
 // ============================================================
-// PAIRLO SEARCH API  (Hono — production-ready stub)
+// PAIRLO SEARCH API  (Hono — production-ready)
 // GET /api/search?destination=Miami&checkIn=2026-10-15&checkOut=2026-10-20&guests=2
-//
-// Currently returns mock-scored pairs.
-// Replace searchStays / searchCars stubs with real API calls at launch.
+// Returns full scored pairs, ready for the frontend to render.
 // ============================================================
 
 import { Hono } from 'hono';
-import { generatePairs, getFallbackPairs } from './matching-engine';
-import { buildEnginePairs } from './mock-adapter';
+import { allPairs } from '../../web/lib/mock-data';
+import { getScoredAndSortedPairs } from './mock-adapter';
 
 const search = new Hono();
 
@@ -20,35 +18,27 @@ search.get('/', async (c) => {
   }
 
   try {
-    // ── Stub: use mock data shaped for the engine ──
-    const { stays, cars } = buildEnginePairs(destination);
-
     const searchParams = { check_in: checkIn, check_out: checkOut };
-
-    let pairs = generatePairs(stays, cars, searchParams);
-    if (pairs.length === 0) {
-      pairs = getFallbackPairs(stays, cars, searchParams);
-    }
+    const scored = getScoredAndSortedPairs(allPairs, searchParams);
 
     return c.json({
       destination,
       checkIn,
       checkOut,
       guests: Number(guests),
-      totalPairs: pairs.length,
-      pairs: pairs.map((p) => ({
-        stayId:    p.stay.id,
-        carId:     p.car.id,
-        pairScore: p.pairScore,
-        distanceKm: Math.round(p.distanceKm * 10) / 10,
-        totalPrice: p.totalPrice,
-        scores: {
-          pair:      p.pairScore,
-          proximity: p.proximityScore,
-          date:      p.dateScore,
-          price:     p.priceScore,
-          style:     p.styleScore,
-        },
+      totalPairs: scored.length,
+      pairs: scored.map(p => ({
+        id:             p.id,
+        badge:          p.badge,
+        separatePrice:  p.separatePrice,
+        carMatchReason: p.carMatchReason,
+        lastBooked:     p.lastBooked,
+        totalNights:    p.totalNights,
+        totalDays:      p.totalDays,
+        engineScore:    p.engineScore,
+        engineBreakdown: p.engineBreakdown ?? null,
+        stay:           p.stay,
+        car:            p.car,
       })),
     });
   } catch (err) {

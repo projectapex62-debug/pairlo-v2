@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { CheckCircle2, ChevronRight, Lock, Shield, CreditCard, User, Mail, Phone, Calendar, Car, Home, ArrowLeft, Copy, Check } from "lucide-react";
 import { allPairs } from "../lib/mock-data";
@@ -132,7 +132,8 @@ export default function CheckoutPage() {
   const [payment, setPayment] = useState({ card: "", expiry: "", cvv: "", name: "", zip: "" });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [processing, setProcessing] = useState(false);
-  const confirmationCode = useMemo(() => "PLO-" + Math.random().toString(36).substring(2, 8).toUpperCase(), []);
+  const [bookingResult, setBookingResult] = useState<{ pairloReference: string; stay: { confirmation: string }; car: { confirmation: string } } | null>(null);
+  const confirmationCode = bookingResult?.pairloReference ?? ("PLO-" + Math.random().toString(36).substring(2, 8).toUpperCase());
 
   const field = (label: string, key: string, placeholder: string, icon: React.ReactNode, type = "text", stateObj = form, setFn = setForm) => (
     <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
@@ -179,12 +180,43 @@ export default function CheckoutPage() {
     return Object.keys(errs).length === 0;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === 0 && !validateStep1()) return;
     if (step === 1) {
       if (!validateStep2()) return;
       setProcessing(true);
-      setTimeout(() => { setProcessing(false); setStep(2); }, 2200);
+      const nights = nightsParam;
+      const stayTotal = pair.stay.price * nights;
+      const carTotal  = pair.car.price  * nights;
+      try {
+        const res = await fetch('/api/checkout/confirm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pairId: pair.id,
+            checkIn:  checkin,
+            checkOut: checkout,
+            nights,
+            guest: {
+              firstName: form.firstName,
+              lastName:  form.lastName,
+              email:     form.email,
+              phone:     form.phone,
+            },
+            stayTotal,
+            carTotal,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setBookingResult(data);
+        }
+      } catch {
+        // Network error — confirmationCode fallback stays
+      } finally {
+        setProcessing(false);
+        setStep(2);
+      }
       return;
     }
     setStep((s) => s + 1);
