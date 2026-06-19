@@ -1,24 +1,25 @@
 // ============================================================
-// PAIRLO API INTEGRATIONS (TypeScript stub)
+// PAIRLO API INTEGRATIONS — Reference / Type Definitions
 // Expedia EPS Rapid (stays) + Booking.com Demand API (cars)
-// Currently stubbed — replace with live calls at launch
+// Ported from 03-api-integrations.js
+//
+// STATUS: Stub — real HTTP calls activate at launch.
+// All shapes match what matching-engine.ts expects.
 // ============================================================
 
-// ── Config (populated via env at launch) ─────────────────
+export interface ExpediaConfig {
+  baseURL: string;  // https://test.ean.com/v3  →  prod at launch
+  key:     string;  // EXPEDIA_API_KEY
+  secret:  string;  // EXPEDIA_API_SECRET
+}
 
-export const EXPEDIA_CONFIG = {
-  baseURL: 'https://test.ean.com/v3', // switch to prod at launch
-  key:     import.meta.env?.VITE_EXPEDIA_API_KEY    ?? '',
-  secret:  import.meta.env?.VITE_EXPEDIA_API_SECRET ?? '',
-};
+export interface BookingConfig {
+  baseURL:  string; // https://distribution-xml.booking.com/3.0
+  username: string; // BOOKING_USERNAME
+  password: string; // BOOKING_PASSWORD
+}
 
-export const BOOKING_CONFIG = {
-  baseURL:  'https://distribution-xml.booking.com/3.0',
-  username: import.meta.env?.VITE_BOOKING_USERNAME ?? '',
-  password: import.meta.env?.VITE_BOOKING_PASSWORD ?? '',
-};
-
-// ── Normalized shapes (what the matching engine expects) ──
+// ── Normalized shapes (what the engine & frontend consume) ──
 
 export interface NormalizedStay {
   id:              string;
@@ -50,109 +51,99 @@ export interface NormalizedCar {
   images:          string[];
 }
 
-// ── Geocoding ─────────────────────────────────────────────
-
-export async function geocodeDestination(destination: string): Promise<{ lat: number; lng: number }> {
-  const key = import.meta.env?.VITE_GOOGLE_MAPS_KEY ?? '';
-  const res = await fetch(
-    `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(destination)}&key=${key}`
-  );
-  const data = await res.json();
-  const loc = data.results?.[0]?.geometry?.location;
-  if (!loc) throw new Error(`Could not geocode destination: ${destination}`);
-  return { lat: loc.lat, lng: loc.lng };
+export interface GeoResult {
+  lat: number;
+  lng: number;
 }
 
-// ── Stay Search ───────────────────────────────────────────
-// TODO: replace stub with live Expedia EPS Rapid call
+// ── Booking payloads ─────────────────────────────────────────
 
-export async function searchStays(_params: {
+export interface GuestInfo {
+  firstName: string;
+  lastName:  string;
+  email:     string;
+  phone:     string;
+  age?:      number;
+}
+
+export interface PaymentInfo {
+  address:    string;
+  city:       string;
+  state:      string;
+  zip:        string;
+  cardType?:  string;
+  cardNumber?: string;
+  expiry?:    string;
+  cvv?:       string;
+}
+
+export interface BookingConfirmation {
+  confirmationNumber: string;
+  status:             "confirmed" | "failed";
+  provider:           "expedia" | "booking_com";
+  commission?:        number;
+}
+
+// ── API function signatures (implemented server-side) ────────
+
+/**
+ * searchStays — calls Expedia EPS Rapid /properties/availability
+ * Returns NormalizedStay[] sorted by Expedia's preferred score
+ */
+export type SearchStaysFn = (params: {
   destination: string;
   checkIn:     string;
   checkOut:    string;
   guests:      number;
   lat:         number;
   lng:         number;
-}): Promise<NormalizedStay[]> {
-  // Stub — real call goes here at launch
-  // POST https://test.ean.com/v3/properties/availability
-  throw new Error('searchStays: not yet connected to Expedia EPS Rapid');
-}
+}) => Promise<NormalizedStay[]>;
 
-// ── Car Search ────────────────────────────────────────────
-// TODO: replace stub with live Booking.com Demand API call
-
-export async function searchCars(_params: {
+/**
+ * searchCars — calls Booking.com Demand API /json/cars
+ * Returns NormalizedCar[] within radius of lat/lng
+ */
+export type SearchCarsFn = (params: {
   lat:         number;
   lng:         number;
   pickupDate:  string;
   returnDate:  string;
   destination: string;
-}): Promise<NormalizedCar[]> {
-  // Stub — real call goes here at launch
-  // GET https://distribution-xml.booking.com/3.0/json/cars
-  throw new Error('searchCars: not yet connected to Booking.com');
-}
+}) => Promise<NormalizedCar[]>;
 
-// ── Stay Booking ──────────────────────────────────────────
-
-export async function bookStay(_params: {
+/**
+ * bookStay — POST to Expedia EPS /itineraries
+ * Returns confirmation number
+ */
+export type BookStayFn = (params: {
   propertyId: string;
   checkIn:    string;
   checkOut:   string;
-  guest:      { firstName: string; lastName: string; email: string; phone: string };
-  payment:    { address: string; city: string; state: string; zip: string };
-}): Promise<{ confirmationNumber: string; status: string; provider: string }> {
-  throw new Error('bookStay: not yet connected to Expedia EPS Rapid');
-}
+  guest:      GuestInfo;
+  payment:    PaymentInfo;
+}) => Promise<BookingConfirmation>;
 
-// ── Car Booking ───────────────────────────────────────────
-
-export async function bookCar(_params: {
+/**
+ * bookCar — POST to Booking.com /json/cars/book
+ * Returns confirmation number + commission amount
+ */
+export type BookCarFn = (params: {
   carId:       string;
   pickupDate:  string;
   returnDate:  string;
-  guest:       { firstName: string; lastName: string; email: string; phone: string; age?: number };
-  payment:     { cardType: string; cardNumber: string; expiry: string; cvv: string };
-}): Promise<{ confirmationNumber: string; status: string; provider: string; commission?: number }> {
-  throw new Error('bookCar: not yet connected to Booking.com');
-}
+  guest:       GuestInfo;
+  payment:     PaymentInfo;
+}) => Promise<BookingConfirmation>;
 
-// ── Normalization helpers (used when real APIs are live) ──
+/**
+ * geocodeDestination — Google Maps Geocoding API
+ * Returns lat/lng for a destination string
+ */
+export type GeocodeFn = (destination: string) => Promise<GeoResult>;
 
-export function normalizeStays(data: any, checkIn: string, checkOut: string): NormalizedStay[] {
-  const nights = Math.ceil(
-    (new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)
-  );
-  return (data.properties || []).map((p: any) => ({
-    id:              p.property_id,
-    expedia_id:      p.property_id,
-    name:            p.name,
-    property_type:   p.type,
-    lat:             p.location?.coordinates?.latitude,
-    lng:             p.location?.coordinates?.longitude,
-    rating:          p.reviews?.rating,
-    price_per_night: p.rooms?.[0]?.rates?.[0]?.nightly_price || 0,
-    total_price:     (p.rooms?.[0]?.rates?.[0]?.nightly_price || 0) * nights,
-    nights,
-    images:          p.images?.slice(0, 5).map((i: any) => i.links?.['350px']?.href) ?? [],
-    amenities:       p.amenities?.slice(0, 10).map((a: any) => a.name) ?? [],
-    cancellation:    p.rooms?.[0]?.rates?.[0]?.cancel_policies?.[0]?.type ?? 'unknown',
-  }));
-}
-
-export function normalizeCars(data: any): NormalizedCar[] {
-  return (data.vehicles || []).map((v: any) => ({
-    id:              v.vehicle_id,
-    booking_id:      v.vehicle_id,
-    name:            `${v.make} ${v.model}`,
-    category:        v.category,
-    pickup_lat:      v.pick_up_location?.latitude,
-    pickup_lng:      v.pick_up_location?.longitude,
-    pickup_address:  v.pick_up_location?.address,
-    total_price:     v.price?.total,
-    seats:           v.seats,
-    transmission:    v.transmission,
-    images:          [v.image_url],
-  }));
-}
+// ── Commission rates ─────────────────────────────────────────
+export const COMMISSION = {
+  stay: 0.06, // 6% via Expedia EPS Rapid
+  car:  0.06, // 6% via Booking.com (Stage 1)
+  // Stage 2: car → 0.18 when direct suppliers go live
+} as const;
