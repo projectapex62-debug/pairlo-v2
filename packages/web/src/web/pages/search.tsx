@@ -4,14 +4,14 @@ import {
   SlidersHorizontal, MapPin, X, LayoutGrid, Map, SearchX,
   Star, Car, TrendingUp, Zap, Filter, ChevronDown, ChevronUp,
 } from "lucide-react";
-import { allPairs, mapPins } from "../lib/mock-data";
+import { mapPins } from "../lib/mock-data";
+import { getSortedPairs } from "../lib/engine-adapter";
 import { PairCard } from "../components/pair-card";
 import { CompareDrawer } from "../components/compare-drawer";
-import { getScoredAndSortedPairs } from "../../api/engine/mock-adapter";
 
-// Pre-score all pairs once using the matching engine (mock dates — representative trip)
-const MOCK_SEARCH = { check_in: "2026-10-15", check_out: "2026-10-20" };
-const scoredPairs = getScoredAndSortedPairs(allPairs, MOCK_SEARCH);
+// Pre-score all pairs once using the real matching engine
+// Uses Oct 15–20 2026 as representative launch dates — swap for user-input dates post-launch
+const scoredPairs = getSortedPairs("2026-10-15", "2026-10-20");
 
 // Helper: inject engineBreakdown into PairCard's engineScore prop
 function ScoredPairCard({ pair }: { pair: typeof scoredPairs[number] }) {
@@ -363,8 +363,8 @@ export default function SearchPage() {
       if (sortBy === "Price: Low to High") return (a.stay?.price ?? 0) - (b.stay?.price ?? 0);
       if (sortBy === "Price: High to Low") return (b.stay?.price ?? 0) - (a.stay?.price ?? 0);
       if (sortBy === "Top Rated") return (b.stay?.rating ?? 0) - (a.stay?.rating ?? 0);
-      // "Recommended" = matching engine score descending (already pre-sorted, but re-sort to be safe)
-      return (b.engineScore ?? 0) - (a.engineScore ?? 0);
+      // "Recommended" = matching engine pairScore descending
+      return ((b as any).engineScore?.pairScore ?? 0) - ((a as any).engineScore?.pairScore ?? 0);
     });
 
   const activeFilterCount = [
